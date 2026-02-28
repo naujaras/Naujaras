@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Naujarás Sevilla | Estancias con Jacuzzi XXL</title>
+    <meta name="description"
+        content="Estancias románticas con Jacuzzi XXL en Sevilla. Consulta disponibilidad, información y reserva online.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Chat Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ===== HOME SCREEN ===== -->
+    <div id="screen-home" class="screen active">
+
+        <!-- ===== FALDÓN / HERO BANNER ===== -->
+        <!-- Para usar tu propia foto: coloca el archivo en images/banner.png -->
+        <div class="hero-banner">
+            <img src="images/banner.png"
+                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=900&q=80'"
+                alt="Suite romántica Naujarás con jacuzzi XXL" class="hero-img">
+            <div class="hero-overlay">
+                <span class="hero-tagline">✨ Tu escapada perfecta en Sevilla</span>
+            </div>
+        </div>
+
+        <header class="home-header">
+            <div class="logo-mark">♥</div>
+            <div>
+                <h1>Naujarás</h1>
+                <p class="tagline">Estancias con Jacuzzi XXL en Sevilla</p>
+            </div>
+        </header>
+
+        <main class="hub-buttons">
+            <button class="hub-btn" onclick="goTo('screen-info')">
+                <span class="hub-icon">💬</span>
+                <span class="hub-label">Información</span>
+                <span class="hub-sub">Preguntas, normas y asistente</span>
+            </button>
+
+            <button class="hub-btn" onclick="goTo('screen-availability')">
+                <span class="hub-icon">📅</span>
+                <span class="hub-label">Disponibilidad</span>
+                <span class="hub-sub">Consulta fechas libres</span>
+            </button>
+
+            <button class="hub-btn" onclick="goTo('screen-media')">
+                <span class="hub-icon">📸</span>
+                <span class="hub-label">Fotos y Vídeos</span>
+                <span class="hub-sub">Conoce nuestras estancias</span>
+            </button>
+
+            <button class="hub-btn accent" onclick="goTo('screen-booking')">
+                <span class="hub-icon">🔑</span>
+                <span class="hub-label">Reservar</span>
+                <span class="hub-sub">Proceso rápido y seguro</span>
+            </button>
+        </main>
+
+        <footer class="home-footer">
+            <a href="tel:+34600000000">📞 ¿Dudas? Llámanos</a>
+        </footer>
+    </div>
+
+    <!-- ===== INFO SCREEN ===== -->
+    <div id="screen-info" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Información</h2>
+        </div>
+
+        <div class="screen-body">
+            <p class="section-intro">Toca una pregunta para obtener respuesta rápida, o escribe directamente al
+                asistente.</p>
+
+            <div class="faq-grid" id="faq-grid">
+                <!-- Injected by JS -->
+            </div>
+
+            <div class="chat-section">
+                <p class="chat-label">¿Más dudas? Habla con el asistente:</p>
+                <button class="open-chat-btn" onclick="openChat()">
+                    💬 Abrir asistente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== AVAILABILITY SCREEN ===== -->
+    <div id="screen-availability" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Disponibilidad</h2>
+        </div>
+
+        <div class="screen-body">
+            <p class="section-intro">Elige tu estancia y consulta las fechas disponibles.</p>
+
+            <div class="room-tabs" id="avail-room-tabs">
+                <button class="room-tab active" onclick="selectAvailRoom('atico', this)">Ático</button>
+                <button class="room-tab" onclick="selectAvailRoom('estudio', this)">Estudio</button>
+                <button class="room-tab" onclick="selectAvailRoom('habitacion', this)">Habitación</button>
+            </div>
+
+            <div class="avail-info-card" id="avail-room-info">
+                <!-- Updated by JS -->
+            </div>
+
+            <button class="cta-btn" id="avail-cta" onclick="goToBookingWithRoom()">
+                Ver disponibilidad y reservar →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MEDIA SCREEN ===== -->
+    <div id="screen-media" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Fotos y Vídeos</h2>
+        </div>
+
+        <div class="screen-body">
+            <div class="room-tabs" id="media-room-tabs">
+                <button class="room-tab active" onclick="selectMediaRoom('atico', this)">Ático</button>
+                <button class="room-tab" onclick="selectMediaRoom('estudio', this)">Estudio</button>
+                <button class="room-tab" onclick="selectMediaRoom('habitacion', this)">Habitación</button>
+            </div>
+
+            <div class="gallery" id="gallery-grid">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+        <div class="floating-reserve">
+            <button class="cta-btn" onclick="goTo('screen-booking')">🔑 Reservar ahora</button>
+        </div>
+    </div>
+
+    <!-- ===== BOOKING SCREEN ===== -->
+    <div id="screen-booking" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Reservar</h2>
+        </div>
+
+        <div class="screen-body">
+            <p class="section-intro">Elige la estancia que quieres reservar y te llevamos directamente al proceso de
+                reserva.</p>
+
+            <div class="booking-rooms">
+                <button class="booking-room-btn" onclick="redirectToBooking('atico')">
+                    <span class="room-emoji">🏠</span>
+                    <div>
+                        <strong>Ático</strong>
+                        <span>Piscina climatizada + Jacuzzi XXL</span>
+                    </div>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="booking-room-btn" onclick="redirectToBooking('estudio')">
+                    <span class="room-emoji">🛋️</span>
+                    <div>
+                        <strong>Estudio</strong>
+                        <span>Jacuzzi XXL · Espacio amplio</span>
+                    </div>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="booking-room-btn" onclick="redirectToBooking('habitacion')">
+                    <span class="room-emoji">🛁</span>
+                    <div>
+                        <strong>Habitación</strong>
+                        <span>Jacuzzi XXL · Ambiente íntimo</span>
+                    </div>
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+
+            <p class="booking-note">También puedes ir directamente sin preseleccionar:</p>
+            <button class="cta-btn outline" onclick="redirectToBooking(null)">Ir al proceso de reserva →</button>
+        </div>
+    </div>
+
+    <!-- ===== CHAT MODAL ===== -->
+    <div id="chat-modal" class="chat-modal">
+        <div class="chat-header">
+            <h3>Asistente Naujarás</h3>
+            <button class="close-chat" onclick="closeChat()">×</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages here -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Escribe tu duda aquí..." autocomplete="off">
+            <button onclick="sendMessage()">ENVIAR</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
