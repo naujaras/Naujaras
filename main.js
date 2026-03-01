@@ -175,7 +175,7 @@ const sessionId = 'hub_' + Math.random().toString(36).substr(2, 9);
 function openChat() {
     document.getElementById('chat-modal').classList.add('active');
     if (chatMessages.length === 0) {
-        addMessage('bot', '¡Hola! Soy el asistente de Naujarás. ¿En qué puedo ayudarte hoy?');
+        addMessage('bot', '¡Hola! 🧡 Soy el asistente de Naujarás. ¿En qué puedo ayudarte hoy?');
         chatMessages.push({ sender: 'bot', text: 'init' });
     }
 }
