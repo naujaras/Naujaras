@@ -197,6 +197,9 @@ async function sendMessage(text = null) {
     if (!text) input.value = '';
     addMessage('user', msg);
 
+    // Small delay to ensure the user message renders before the typing indicator
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     // Show animated typing indicator
     const typingId = addMessage('bot', '⏳ Consultando...', true);
 
@@ -267,9 +270,11 @@ function formatBotText(text) {
     return safe;
 }
 
+let msgCounter = 0;
 function addMessage(sender, text, isTyping = false) {
     const container = document.getElementById('chat-messages');
-    const id = 'msg_' + Date.now();
+    msgCounter++;
+    const id = 'msg_' + msgCounter + '_' + Date.now();
     const div = document.createElement('div');
     div.className = 'message ' + sender + (isTyping ? ' typing' : '');
     div.id = id;
