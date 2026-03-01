@@ -68,7 +68,7 @@ function goBack() {
 function renderFaqs() {
     const grid = document.getElementById('faq-grid');
     grid.innerHTML = CONFIG.FAQ.map(item => `
-        <div class="faq-card" onclick="askChatbot('${item.question.replace(/'/g, "\\'")}')">
+        <div class="faq-card" onclick="askChatbot('${item.question.replace(/'/g, "\\'")}')"">
             <h4>${item.question}</h4>
             <span class="faq-action">Consultar al asistente →</span>
         </div>
@@ -252,13 +252,35 @@ async function sendMessage(text = null) {
     }
 }
 
+// --- FORMAT BOT TEXT (Markdown to HTML) ---
+function formatBotText(text) {
+    // Sanitize: escape HTML entities first
+    var safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Convert markdown bold **text** or __text__ to <strong>
+    safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    // Convert markdown italic *text* or _text_ to <em> (single asterisk)
+    safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Handle both literal \n (from JSON string) and real newlines
+    safe = safe.replace(/\\n/g, '<br>');
+    safe = safe.replace(/\n/g, '<br>');
+    return safe;
+}
+
 function addMessage(sender, text, isTyping = false) {
     const container = document.getElementById('chat-messages');
     const id = 'msg_' + Date.now();
     const div = document.createElement('div');
-    div.className = `message ${sender} ${isTyping ? 'typing' : ''}`;
+    div.className = 'message ' + sender + (isTyping ? ' typing' : '');
     div.id = id;
-    div.innerHTML = `<div class="msg-content">${text.replace(/\n/g, '<br>')}</div>`;
+    // Format bot text (markdown → HTML), sanitize user text
+    var formatted;
+    if (sender === 'bot') {
+        formatted = formatBotText(text);
+    } else {
+        formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    div.innerHTML = '<div class="msg-content">' + formatted + '</div>';
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
     return id;
