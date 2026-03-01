@@ -75,10 +75,14 @@ function renderFaqs() {
     `).join('');
 }
 
-// --- AVAILABILITY ---
+// --- AVAILABILITY (Custom Calendar) ---
 const ROOM_SCHEDULES = {
     atico: {
         slots: [
+            { name: 'Día', hours: '13:00 – 20:00', icon: '☀️', startH: 13, startM: 0, endH: 20, endM: 0, overnight: false },
+            { name: 'Noche', hours: '22:00 – 11:00', icon: '🌙', startH: 22, startM: 0, endH: 11, endM: 0, overnight: true }
+        ],
+        displaySlots: [
             { name: 'Día', hours: '13:00 – 20:00', icon: '☀️' },
             { name: 'Noche', hours: '22:00 – 11:00', icon: '🌙' },
             { name: 'Día Entero (mañana)', hours: '13:00 – 11:00', icon: '🌅' },
@@ -87,6 +91,10 @@ const ROOM_SCHEDULES = {
     },
     estudio: {
         slots: [
+            { name: 'Día', hours: '11:30 – 18:30', icon: '☀️', startH: 11, startM: 30, endH: 18, endM: 30, overnight: false },
+            { name: 'Noche', hours: '20:00 – 10:00', icon: '🌙', startH: 20, startM: 0, endH: 10, endM: 0, overnight: true }
+        ],
+        displaySlots: [
             { name: 'Día', hours: '11:30 – 18:30', icon: '☀️' },
             { name: 'Noche', hours: '20:00 – 10:00', icon: '🌙' },
             { name: 'Día Entero (mañana)', hours: '11:30 – 10:00', icon: '🌅' },
@@ -95,6 +103,10 @@ const ROOM_SCHEDULES = {
     },
     habitacion: {
         slots: [
+            { name: 'Día', hours: '13:30 – 19:30', icon: '☀️', startH: 13, startM: 30, endH: 19, endM: 30, overnight: false },
+            { name: 'Noche', hours: '21:00 – 12:00', icon: '🌙', startH: 21, startM: 0, endH: 12, endM: 0, overnight: true }
+        ],
+        displaySlots: [
             { name: 'Día', hours: '13:30 – 19:30', icon: '☀️' },
             { name: 'Noche', hours: '21:00 – 12:00', icon: '🌙' },
             { name: 'Día Entero (mañana)', hours: '13:30 – 12:00', icon: '🌅' },
@@ -103,6 +115,8 @@ const ROOM_SCHEDULES = {
     }
 };
 
+let calState = { room: 'atico', year: 2026, month: 2, busy: [] }; // month is 0-indexed
+
 function selectAvailRoom(roomKey, btn) {
     document.querySelectorAll('#avail-room-tabs .room-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -110,14 +124,20 @@ function selectAvailRoom(roomKey, btn) {
 }
 
 function updateAvailInfo(roomKey) {
-    const room = CONFIG.ROOMS[roomKey];
-    const schedule = ROOM_SCHEDULES[roomKey];
+    const now = new Date();
+    calState.room = roomKey;
+    calState.year = now.getFullYear();
+    calState.month = now.getMonth();
+    calState.busy = [];
+    loadAndRenderCalendar();
+}
+
+async function loadAndRenderCalendar() {
+    const room = CONFIG.ROOMS[calState.room];
+    const schedule = ROOM_SCHEDULES[calState.room];
     const info = document.getElementById('avail-room-info');
 
-    // Google Calendar Embed URL (público) para visualización inmediata
-    const calendarUrl = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(room.calendarId)}&ctz=Europe%2FMadrid&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=2`;
-
-    const slotsHtml = schedule.slots.map(slot => `
+    const slotsHtml = schedule.displaySlots.map(slot => `
         <div class="time-slot-card">
             <span class="slot-icon">${slot.icon}</span>
             <div class="slot-info">
@@ -133,19 +153,179 @@ function updateAvailInfo(roomKey) {
             <p class="room-desc">${room.desc}</p>
         </div>
         <div class="time-slots-grid">
-            <p class="slots-title">Tramos horarios disponibles</p>
+            <p class="slots-title">Tramos horarios</p>
             ${slotsHtml}
         </div>
-        <div class="calendar-note">Los eventos en el calendario indican tramos ya reservados. Los huecos libres son tramos disponibles.</div>
-        <div class="visual-calendar-container" style="margin: 12px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
-            <iframe src="${calendarUrl}" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+        <div class="custom-cal">
+            <div class="cal-nav">
+                <button class="cal-nav-btn" onclick="changeCalMonth(-1)">‹</button>
+                <span class="cal-month-label" id="cal-month-label"></span>
+                <button class="cal-nav-btn" onclick="changeCalMonth(1)">›</button>
+            </div>
+            <div class="cal-header-row">
+                <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div class="cal-grid" id="cal-grid">
+                <div class="cal-loading">Cargando disponibilidad...</div>
+            </div>
         </div>
+        <div class="day-detail-panel" id="day-detail" style="display:none;"></div>
         <div class="avail-status">
             <span class="pulse"></span>
             ${room.availability}
         </div>
     `;
-    document.getElementById('avail-cta').onclick = () => redirectToBooking(roomKey);
+    document.getElementById('avail-cta').onclick = () => redirectToBooking(calState.room);
+
+    // Fetch busy blocks
+    await fetchAndRenderMonth();
+}
+
+function changeCalMonth(delta) {
+    calState.month += delta;
+    if (calState.month > 11) { calState.month = 0; calState.year++; }
+    if (calState.month < 0) { calState.month = 11; calState.year--; }
+    document.getElementById('day-detail').style.display = 'none';
+    fetchAndRenderMonth();
+}
+
+async function fetchAndRenderMonth() {
+    const grid = document.getElementById('cal-grid');
+    const label = document.getElementById('cal-month-label');
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    label.textContent = monthNames[calState.month] + ' ' + calState.year;
+    grid.innerHTML = '<div class="cal-loading">Cargando...</div>';
+
+    const dateFrom = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(calState.year, calState.month + 1, 0).getDate();
+    const dateTo = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-${lastDay}`;
+
+    try {
+        const resp = await fetch(`${CONFIG.N8N_CHATBOT_URL.replace('chatbot-hub', 'disponibilidad')}?room=${calState.room}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { signal: AbortSignal.timeout(8000) });
+        const data = await resp.json();
+        calState.busy = Array.isArray(data) ? (data[0]?.busy || []) : (data.busy || []);
+    } catch (e) {
+        console.warn('API no disponible, mostrando calendario sin datos de reservas:', e);
+        calState.busy = [];
+    }
+
+    renderMonthGrid();
+}
+
+function renderMonthGrid() {
+    const grid = document.getElementById('cal-grid');
+    const year = calState.year, month = calState.month;
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const startOffset = firstDay === 0 ? 6 : firstDay - 1; // Monday=0
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let html = '';
+    // Empty cells before 1st
+    for (let i = 0; i < startOffset; i++) {
+        html += '<div class="cal-day empty"></div>';
+    }
+
+    for (let d = 1; d <= totalDays; d++) {
+        const date = new Date(year, month, d);
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isPast = date < today;
+        const isToday = date.getTime() === today.getTime();
+
+        if (isPast && !isToday) {
+            html += `<div class="cal-day past"><span>${d}</span></div>`;
+            continue;
+        }
+
+        const status = getDayStatus(dateStr);
+        const statusClass = status === 'free' ? 'free' : status === 'partial' ? 'partial' : 'full';
+        html += `<div class="cal-day ${statusClass}${isToday ? ' today' : ''}" onclick="showDaySlots('${dateStr}')">
+            <span>${d}</span>
+            <div class="status-dot"></div>
+        </div>`;
+    }
+
+    grid.innerHTML = html;
+}
+
+function getDayStatus(dateStr) {
+    const slots = ROOM_SCHEDULES[calState.room].slots;
+    const diaFree = isSlotFree(dateStr, slots[0]); // Día
+    const nocheFree = isSlotFree(dateStr, slots[1]); // Noche
+
+    if (diaFree && nocheFree) return 'free';
+    if (!diaFree && !nocheFree) return 'full';
+    return 'partial';
+}
+
+function isSlotFree(dateStr, slot) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    let slotStart, slotEnd;
+
+    if (slot.overnight) {
+        slotStart = new Date(y, m - 1, d, slot.startH, slot.startM);
+        slotEnd = new Date(y, m - 1, d + 1, slot.endH, slot.endM);
+    } else {
+        slotStart = new Date(y, m - 1, d, slot.startH, slot.startM);
+        slotEnd = new Date(y, m - 1, d, slot.endH, slot.endM);
+    }
+
+    for (const b of calState.busy) {
+        const bStart = new Date(b.start);
+        const bEnd = new Date(b.end);
+        // Overlap check: events overlap if one starts before the other ends
+        if (bStart < slotEnd && bEnd > slotStart) return false;
+    }
+    return true;
+}
+
+function showDaySlots(dateStr) {
+    const panel = document.getElementById('day-detail');
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    const slots = ROOM_SCHEDULES[calState.room].slots;
+    const diaFree = isSlotFree(dateStr, slots[0]);
+    const nocheFree = isSlotFree(dateStr, slots[1]);
+    const enteroMananaFree = diaFree && nocheFree;
+    // Día entero noche: Noche of this day + Día of next day
+    const nextDateStr = formatDate(new Date(y, m - 1, d + 1));
+    const nextDiaFree = isSlotFree(nextDateStr, slots[0]);
+    const enteroNocheFree = nocheFree && nextDiaFree;
+
+    const allSlots = [
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[0], free: diaFree },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[1], free: nocheFree },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[2], free: enteroMananaFree },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[3], free: enteroNocheFree }
+    ];
+
+    panel.style.display = 'block';
+    panel.innerHTML = `
+        <div class="day-detail-header">
+            <span>${dayNames[date.getDay()]} ${d} de ${monthNames[m - 1]}</span>
+            <button class="day-detail-close" onclick="document.getElementById('day-detail').style.display='none'">✕</button>
+        </div>
+        ${allSlots.map(s => `
+            <div class="slot-row ${s.free ? 'free' : 'reserved'}">
+                <span class="slot-row-icon">${s.icon}</span>
+                <div class="slot-row-info">
+                    <span class="slot-row-name">${s.name}</span>
+                    <span class="slot-row-hours">${s.hours}</span>
+                </div>
+                <span class="slot-row-status">${s.free ? '✅ LIBRE' : '❌ RESERVADO'}</span>
+            </div>
+        `).join('')}
+        ${allSlots.some(s => s.free) ? '<button class="cta-btn" style="margin-top:12px" onclick="redirectToBooking(\'' + calState.room + '\')">Reservar este tramo →</button>' : '<p class="day-full-msg">Todos los tramos están reservados para este día.</p>'}
+    `;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function formatDate(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 // --- MEDIA / GALLERY ---
