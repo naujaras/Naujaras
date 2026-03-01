@@ -76,6 +76,33 @@ function renderFaqs() {
 }
 
 // --- AVAILABILITY ---
+const ROOM_SCHEDULES = {
+    atico: {
+        slots: [
+            { name: 'Día', hours: '13:00 – 20:00', icon: '☀️' },
+            { name: 'Noche', hours: '22:00 – 11:00', icon: '🌙' },
+            { name: 'Día Entero (mañana)', hours: '13:00 – 11:00', icon: '🌅' },
+            { name: 'Día Entero (noche)', hours: '22:00 – 20:00', icon: '🌆' }
+        ]
+    },
+    estudio: {
+        slots: [
+            { name: 'Día', hours: '11:30 – 18:30', icon: '☀️' },
+            { name: 'Noche', hours: '20:00 – 10:00', icon: '🌙' },
+            { name: 'Día Entero (mañana)', hours: '11:30 – 10:00', icon: '🌅' },
+            { name: 'Día Entero (noche)', hours: '20:00 – 18:30', icon: '🌆' }
+        ]
+    },
+    habitacion: {
+        slots: [
+            { name: 'Día', hours: '13:30 – 19:30', icon: '☀️' },
+            { name: 'Noche', hours: '21:00 – 12:00', icon: '🌙' },
+            { name: 'Día Entero (mañana)', hours: '13:30 – 12:00', icon: '🌅' },
+            { name: 'Día Entero (noche)', hours: '21:00 – 19:30', icon: '🌆' }
+        ]
+    }
+};
+
 function selectAvailRoom(roomKey, btn) {
     document.querySelectorAll('#avail-room-tabs .room-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -84,17 +111,33 @@ function selectAvailRoom(roomKey, btn) {
 
 function updateAvailInfo(roomKey) {
     const room = CONFIG.ROOMS[roomKey];
+    const schedule = ROOM_SCHEDULES[roomKey];
     const info = document.getElementById('avail-room-info');
 
     // Google Calendar Embed URL (público) para visualización inmediata
     const calendarUrl = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(room.calendarId)}&ctz=Europe%2FMadrid&showTitle=0&showNav=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=2`;
+
+    const slotsHtml = schedule.slots.map(slot => `
+        <div class="time-slot-card">
+            <span class="slot-icon">${slot.icon}</span>
+            <div class="slot-info">
+                <span class="slot-name">${slot.name}</span>
+                <span class="slot-hours">${slot.hours}</span>
+            </div>
+        </div>
+    `).join('');
 
     info.innerHTML = `
         <div class="room-detail-header">
             <h3>${room.name}</h3>
             <p class="room-desc">${room.desc}</p>
         </div>
-        <div class="visual-calendar-container" style="margin: 20px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+        <div class="time-slots-grid">
+            <p class="slots-title">Tramos horarios disponibles</p>
+            ${slotsHtml}
+        </div>
+        <div class="calendar-note">Los eventos en el calendario indican tramos ya reservados. Los huecos libres son tramos disponibles.</div>
+        <div class="visual-calendar-container" style="margin: 12px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
             <iframe src="${calendarUrl}" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
         </div>
         <div class="avail-status">
