@@ -3,21 +3,21 @@ const CONFIG = {
         atico: {
             name: "Ático con Piscina",
             desc: "Piscina privada climatizada y Jacuzzi XXL",
-            bookingUrl: "https://naujaras-reservas.vercel.app/?room=atico",
+            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=atico",
             availability: "Suele agotarse con 2 semanas de antelación.",
             calendarId: "91fbc4c4ce05435d7146988aceb737dcd04b6c1c6648de88a8edde5b62407de3@group.calendar.google.com"
         },
         estudio: {
             name: "Estudio Jacuzzi XXL",
             desc: "Espacio amplio con todas las comodidades",
-            bookingUrl: "https://naujaras-reservas.vercel.app/?room=estudio",
+            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=estudio",
             availability: "Disponibilidad alta entre semana.",
             calendarId: "d4e9330a3e5bd3016772624c0edf840a8be0a83b6c8cfb567779b5fd036a1715@group.calendar.google.com"
         },
         habitacion: {
             name: "Habitación Jacuzzi XXL",
             desc: "Ambiente íntimo y romántico",
-            bookingUrl: "https://naujaras-reservas.vercel.app/?room=habitacion",
+            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=habitacion",
             availability: "Ideal para escapadas de última hora.",
             calendarId: "2484f196e7d7bcf5bc15ff2a9ff20b2125a0c7c02bac42fdd3fba82d759f1529@group.calendar.google.com"
         }
@@ -345,3 +345,228 @@ const GALLERY = {
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' },
+        { type: 'image', src: 'images/Estudio_4.png' },
+        { type: 'image', src: 'images/Estudio_5.png' },
+        { type: 'image', src: 'images/Estudio_6.png' },
+        { type: 'image', src: 'images/Estudio_7.png' },
+        { type: 'image', src: 'images/Estudio_8.png' }
+    ],
+    habitacion: [
+        { type: 'image', src: 'images/Habitacion_1.png' },
+        { type: 'image', src: 'images/Habitacion_2.png' },
+        { type: 'image', src: 'images/Habitacion_3.png' }
+    ]
+};
+
+function selectMediaRoom(roomKey, btn) {
+    document.querySelectorAll('#media-room-tabs .room-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGallery(roomKey);
+}
+
+function renderGallery(roomKey) {
+    const grid = document.getElementById('gallery-grid');
+    const items = GALLERY[roomKey] || [];
+
+    grid.innerHTML = items.map(item => {
+        if (item.type === 'video') {
+            return `
+                <div class="gallery-item video-item full-width" style="grid-column: span 2; aspect-ratio: 16/9;">
+                    <iframe src="https://www.youtube.com/embed/${item.id}" frameborder="0" allowfullscreen style="width:100%; height:100%;"></iframe>
+                </div>
+            `;
+        }
+        return `
+            <div class="gallery-item">
+                <img src="${item.src}" alt="Naujarás Sevilla" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=Naujaras'">
+            </div>
+        `;
+    }).join('');
+}
+
+// --- BOOKING ---
+function redirectToBooking(roomKey) {
+    const baseUrl = "https://booking-jl-new-wktk.vercel.app/";
+    const url = roomKey ? `${baseUrl}?room=${roomKey}` : baseUrl;
+    window.location.href = url;
+}
+
+// --- NATIVE CHATBOT (n8n) ---
+let chatMessages = [];
+const sessionId = 'hub_' + Math.random().toString(36).substr(2, 9);
+
+function openChat() {
+    document.getElementById('chat-modal').classList.add('active');
+    if (chatMessages.length === 0) {
+        addMessage('bot', '¡Hola! 🧡 Soy el asistente de Naujarás. ¿En qué puedo ayudarte hoy?');
+        chatMessages.push({ sender: 'bot', text: 'init' });
+    }
+}
+
+function closeChat() {
+    document.getElementById('chat-modal').classList.remove('active');
+}
+
+function askChatbot(text) {
+    openChat();
+    sendMessage(text);
+}
+
+async function sendMessage(text = null) {
+    const input = document.getElementById('chat-input');
+    const msg = text || input.value.trim();
+    if (!msg) return;
+
+    if (!text) input.value = '';
+    addMessage('user', msg);
+
+    // Small delay to ensure the user message renders before the typing indicator
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Show animated typing indicator
+    const typingId = addMessage('bot', '⏳ Consultando...', true);
+
+    // Animated ellipsis while waiting
+    let dots = 0;
+    const loadingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        const el = document.getElementById(typingId);
+        if (el) el.querySelector('.msg-content').textContent = '⏳ Consultando' + '.'.repeat(dots);
+    }, 600);
+
+    // AbortController with 3 minute timeout (AI Agent can take up to 90 seconds)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+    try {
+        const response = await fetch(CONFIG.N8N_CHATBOT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: msg,
+                sessionId: sessionId,
+                source: 'hub'
+            }),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        clearInterval(loadingInterval);
+        removeMessage(typingId);
+
+        const data = await response.json();
+
+        // Handle n8n response format
+        let botText = "Lo siento, he tenido un problema conectando con mi cerebro. ¿Puedes repetir?";
+        if (Array.isArray(data)) {
+            botText = data[0].output || data[0].content || data[0].text || botText;
+        } else {
+            botText = data.output || data.content || data.text || botText;
+        }
+
+        addMessage('bot', botText);
+    } catch (e) {
+        clearTimeout(timeoutId);
+        clearInterval(loadingInterval);
+        removeMessage(typingId);
+        if (e.name === 'AbortError') {
+            addMessage('bot', 'La respuesta está tardando demasiado. El asistente está muy ocupado ahora mismo. Inténtalo en un momento.');
+        } else {
+            console.error(e);
+            addMessage('bot', 'Vaya, parece que no tengo conexión ahora mismo. Por favor, inténtalo de nuevo en unos segundos.');
+        }
+    }
+}
+
+// --- FORMAT BOT TEXT (Markdown to HTML) ---
+function formatBotText(text) {
+    // Sanitize: escape HTML entities first
+    var safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Convert markdown bold **text** or __text__ to <strong>
+    safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    // Convert markdown italic *text* or _text_ to <em> (single asterisk)
+    safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Handle both literal \n (from JSON string) and real newlines
+    safe = safe.replace(/\\n/g, '<br>');
+    safe = safe.replace(/\n/g, '<br>');
+    return safe;
+}
+
+let msgCounter = 0;
+function addMessage(sender, text, isTyping = false) {
+    const container = document.getElementById('chat-messages');
+    msgCounter++;
+    const id = 'msg_' + msgCounter + '_' + Date.now();
+    const div = document.createElement('div');
+    div.className = 'message ' + sender + (isTyping ? ' typing' : '');
+    div.id = id;
+    // Format bot text (markdown → HTML), sanitize user text
+    var formatted;
+    if (sender === 'bot') {
+        formatted = formatBotText(text);
+    } else {
+        formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    div.innerHTML = '<div class="msg-content">' + formatted + '</div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return id;
+}
+
+function removeMessage(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+}
+
+// Handle Enter key
+document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && document.getElementById('chat-modal').classList.contains('active')) {
+        sendMessage();
+    }
+});
+
+// --- DYNAMIC OFFERS FROM N8N ---
+const OFFER_WEBHOOK_URL = 'https://n8n-n8n.npfusf.easypanel.host/webhook/check-offer';
+let offerImageUrl = null;
+
+async function checkActiveOffer() {
+    try {
+        const response = await fetch(OFFER_WEBHOOK_URL);
+        const data = await response.json();
+
+        // n8n returns an array or object. We expect { active: true, imageUrl: "..." }
+        const offerData = Array.isArray(data) ? data[0] : data;
+
+        if (offerData && offerData.active && offerData.imageUrl) {
+            offerImageUrl = offerData.imageUrl;
+
+            // Unhide the red flashing button
+            const btn = document.getElementById('hub-offer-btn');
+            if (btn) {
+                btn.classList.add('show-offer');
+            }
+        }
+    } catch (err) {
+        console.warn('No se pudo comprobar oferta activa:', err);
+    }
+}
+
+function openOfferModal() {
+    if (!offerImageUrl) return;
+    const modal = document.getElementById('offer-modal');
+    const img = document.getElementById('offer-image-full');
+
+    img.src = offerImageUrl;
+    modal.classList.add('active');
+}
+
+function closeOfferModal() {
+    const modal = document.getElementById('offer-modal');
+    modal.classList.remove('active');
+}
+
+// Run offer check on page load
+document.addEventListener('DOMContentLoaded', () => {
+    checkActiveOffer();
+});

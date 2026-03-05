@@ -8,10 +8,12 @@
     <meta name="description"
         content="Estancias románticas con Jacuzzi XXL en Sevilla. Consulta disponibilidad, información y reserva online.">
 
-    <!-- Fonts -->
+    <!-- Fonts (Same as Web App) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Josefin+Sans:wght@300;400;700&display=swap"
+        rel="stylesheet">
 
     <!-- Custom Chat Styles -->
     <link rel="stylesheet" href="style.css">
@@ -65,10 +67,18 @@
                 <span class="hub-label">Reservar</span>
                 <span class="hub-sub">Proceso rápido y seguro</span>
             </button>
+
+            <!-- Bóton de Oferta (Oculto por defecto, se muestra por JS) -->
+            <button id="hub-offer-btn" class="hub-btn offer-btn" onclick="openOfferModal()">
+                <span class="hub-icon">🔥</span>
+                <span class="hub-label">OFERTA ÚLTIMA HORA</span>
+                <span class="hub-sub">Toca para descubrirla</span>
+            </button>
         </main>
 
         <footer class="home-footer">
-            <a href="tel:+34600000000">📞 ¿Dudas? Llámanos</a>
+            <a href="https://wa.me/34677222166?text=Hola,%20tengo%20una%20duda%20sobre%20las%20reservas."
+                target="_blank" rel="noopener noreferrer">💬 ¿Dudas? Escríbenos</a>
         </footer>
     </div>
 
@@ -201,6 +211,14 @@
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Escribe tu duda aquí..." autocomplete="off">
             <button onclick="sendMessage()">ENVIAR</button>
+        </div>
+    </div>
+
+    <!-- ===== OFFER MODAL ===== -->
+    <div id="offer-modal" class="offer-modal">
+        <div class="offer-content">
+            <button class="offer-close" onclick="closeOfferModal()">✕</button>
+            <img id="offer-image-full" src="" alt="Oferta de Última Hora en Naujarás">
         </div>
     </div>
 
