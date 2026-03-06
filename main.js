@@ -331,7 +331,7 @@ function formatDate(d) {
 // --- MEDIA / GALLERY ---
 const GALLERY = {
     atico: [
-        { type: 'video', id: 'mS_6S331MNo' },
+        // { type: 'video', id: 'mS_6S331MNo' }, // Video actual "no disponible"
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
         { type: 'image', src: 'images/Atico_3.png' },
@@ -341,7 +341,7 @@ const GALLERY = {
         { type: 'image', src: 'images/Atico_7.png' }
     ],
     estudio: [
-        { type: 'video', id: 'p7eF5KAnF0k' },
+        // { type: 'video', id: 'p7eF5KAnF0k' }, // Video actual "no disponible"
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' },
