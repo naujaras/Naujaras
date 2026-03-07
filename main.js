@@ -540,14 +540,15 @@ async function checkActiveOffer() {
         // Limpiar el array para asegurar datos nuevos
         offerImageUrls = [];
 
-        // n8n puede devolver un array de archivos, iteramos y guardamos todos los activos
-        const items = Array.isArray(data) ? data : [data];
-
-        items.forEach(offerData => {
-            if (offerData && offerData.active && offerData.imageUrl) {
-                offerImageUrls.push(offerData.imageUrl);
+        // Nuevo formato: { active: true, imageUrls: ["url1", "url2"] }
+        if (data && data.active) {
+            if (Array.isArray(data.imageUrls)) {
+                offerImageUrls = data.imageUrls;
+            } else if (data.imageUrl) {
+                // Formato antiguo por si no han actualizado en n8n: { active: true, imageUrl: "url" }
+                offerImageUrls = [data.imageUrl];
             }
-        });
+        }
 
         // Si tenemos al menos una oferta, mostramos el botón brillante en la Home
         if (offerImageUrls.length > 0) {
@@ -567,6 +568,10 @@ function openOfferModal() {
     const modal = document.getElementById('offer-modal');
     const container = document.getElementById('offer-images-container');
 
+    // Forzar contenedor para evitar flechas de scroll horizontales
+    container.style.overflowX = 'hidden';
+    container.style.boxSizing = 'border-box';
+
     // Limpiamos imágenes previas que hubiésemos creado antes, conservando solo el botón de cerrar
     Array.from(container.children).forEach(child => {
         if (!child.classList.contains('offer-close')) {
@@ -582,9 +587,11 @@ function openOfferModal() {
         img.className = 'offer-img';
         // Estilos base para que salgan una debajo de otra y ajustadas
         img.style.width = '100%';
+        img.style.maxWidth = '100%';
         img.style.display = 'block';
         img.style.borderRadius = '12px';
-        img.style.marginBottom = '16px';
+        img.style.marginBottom = '20px';
+        img.style.boxSizing = 'border-box';
 
         container.appendChild(img);
     });
