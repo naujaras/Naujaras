@@ -530,20 +530,27 @@ document.addEventListener('keypress', (e) => {
 
 // --- DYNAMIC OFFERS FROM N8N ---
 const OFFER_WEBHOOK_URL = 'https://n8n-n8n.npfusf.easypanel.host/webhook/check-offer';
-let offerImageUrl = null;
+let offerImageUrls = [];
 
 async function checkActiveOffer() {
     try {
         const response = await fetch(OFFER_WEBHOOK_URL);
         const data = await response.json();
 
-        // n8n returns an array or object. We expect { active: true, imageUrl: "..." }
-        const offerData = Array.isArray(data) ? data[0] : data;
+        // Limpiar el array para asegurar datos nuevos
+        offerImageUrls = [];
 
-        if (offerData && offerData.active && offerData.imageUrl) {
-            offerImageUrl = offerData.imageUrl;
+        // n8n puede devolver un array de archivos, iteramos y guardamos todos los activos
+        const items = Array.isArray(data) ? data : [data];
 
-            // Unhide the red flashing button
+        items.forEach(offerData => {
+            if (offerData && offerData.active && offerData.imageUrl) {
+                offerImageUrls.push(offerData.imageUrl);
+            }
+        });
+
+        // Si tenemos al menos una oferta, mostramos el botón brillante en la Home
+        if (offerImageUrls.length > 0) {
             const btn = document.getElementById('hub-offer-btn');
             if (btn) {
                 btn.classList.add('show-offer');
@@ -555,11 +562,33 @@ async function checkActiveOffer() {
 }
 
 function openOfferModal() {
-    if (!offerImageUrl) return;
-    const modal = document.getElementById('offer-modal');
-    const img = document.getElementById('offer-image-full');
+    if (offerImageUrls.length === 0) return;
 
-    img.src = offerImageUrl;
+    const modal = document.getElementById('offer-modal');
+    const container = document.getElementById('offer-images-container');
+
+    // Limpiamos imágenes previas que hubiésemos creado antes, conservando solo el botón de cerrar
+    Array.from(container.children).forEach(child => {
+        if (!child.classList.contains('offer-close')) {
+            child.remove();
+        }
+    });
+
+    // Inyectamos cada imagen en el modal
+    offerImageUrls.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = "Oferta de Última Hora en Naujarás";
+        img.className = 'offer-img';
+        // Estilos base para que salgan una debajo de otra y ajustadas
+        img.style.width = '100%';
+        img.style.display = 'block';
+        img.style.borderRadius = '12px';
+        img.style.marginBottom = '16px';
+
+        container.appendChild(img);
+    });
+
     modal.classList.add('active');
 }
 
