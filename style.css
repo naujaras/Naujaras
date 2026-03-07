@@ -800,12 +800,13 @@ h6,
 .time-slots-grid {
     margin: 16px 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* On mobile it will be 1 column if too narrow, otherwise 2 */
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
     gap: 8px;
 }
 
 .slots-title {
-    grid-column: span 2;
+    grid-column: 1 / -1;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--primary);
@@ -822,6 +823,8 @@ h6,
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px 12px;
+    min-width: 0;
+    /* Permite truncar el texto en vez de desbordar la pantalla */
 }
 
 .slot-icon {
@@ -1038,10 +1041,25 @@ h6,
     padding: 12px;
     border-radius: 10px;
     margin-bottom: 6px;
+    transition: all 0.2s;
+}
+
+.selectable-slot {
+    cursor: pointer;
+}
+
+.selectable-slot:hover {
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.selected-slot {
+    border: 2px solid var(--primary) !important;
+    background: rgba(79, 195, 247, 0.2) !important;
+    transform: scale(1.02);
 }
 
 .slot-row.free {
-    background: rgba(76, 175, 80, 0.12);
+    background: rgba(76, 175, 80, 0.08);
     border: 1px solid rgba(76, 175, 80, 0.3);
 }
 

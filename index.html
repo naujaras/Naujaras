@@ -62,10 +62,10 @@
                 <span class="hub-sub">Conoce nuestras estancias</span>
             </button>
 
-            <button class="hub-btn accent" onclick="goTo('screen-booking')">
+            <button class="hub-btn accent" onclick="redirectToBooking(null)">
                 <span class="hub-icon">🔑</span>
                 <span class="hub-label">Reservar</span>
-                <span class="hub-sub">Proceso rápido y seguro</span>
+                <span class="hub-sub">Proceso rápido y directo</span>
             </button>
 
             <!-- Bóton de Oferta (Oculto por defecto, se muestra por JS) -->
@@ -151,54 +151,12 @@
         </div>
 
         <div class="floating-reserve">
-            <button class="cta-btn" onclick="goTo('screen-booking')">🔑 Reservar ahora</button>
+            <button class="cta-btn" onclick="redirectToBooking(calState ? calState.room : null)">🔑 Reservar
+                ahora</button>
         </div>
     </div>
 
-    <!-- ===== BOOKING SCREEN ===== -->
-    <div id="screen-booking" class="screen">
-        <div class="screen-header">
-            <button class="back-btn" onclick="goBack()">← Volver</button>
-            <h2>Reservar</h2>
-        </div>
-
-        <div class="screen-body">
-            <p class="section-intro">Elige la estancia que quieres reservar y te llevamos directamente al proceso de
-                reserva.</p>
-
-            <div class="booking-rooms">
-                <button class="booking-room-btn" onclick="redirectToBooking('atico')">
-                    <span class="room-emoji">🏠</span>
-                    <div>
-                        <strong>Ático</strong>
-                        <span>Piscina climatizada + Jacuzzi XXL</span>
-                    </div>
-                    <span class="arrow">→</span>
-                </button>
-                <button class="booking-room-btn" onclick="redirectToBooking('estudio')">
-                    <span class="room-emoji">🛋️</span>
-                    <div>
-                        <strong>Estudio</strong>
-                        <span>Jacuzzi XXL · Espacio amplio</span>
-                    </div>
-                    <span class="arrow">→</span>
-                </button>
-                <button class="booking-room-btn" onclick="redirectToBooking('habitacion')">
-                    <span class="room-emoji">🛁</span>
-                    <div>
-                        <strong>Habitación</strong>
-                        <span>Jacuzzi XXL · Ambiente íntimo</span>
-                    </div>
-                    <span class="arrow">→</span>
-                </button>
-            </div>
-
-            <p class="booking-note">También puedes ir directamente sin preseleccionar:</p>
-            <button class="cta-btn outline" onclick="redirectToBooking(null)">Ir al proceso de reserva →</button>
-        </div>
-    </div>
-
-    <!-- ===== CHAT MODAL ===== -->
+    <!-- ===== BOOKING SCREEN REMOVED ===== --> <!-- ===== CHAT MODAL ===== -->
     <div id="chat-modal" class="chat-modal">
         <div class="chat-header">
             <h3>Asistente Naujarás</h3>

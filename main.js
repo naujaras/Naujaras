@@ -280,7 +280,12 @@ function isSlotFree(dateStr, slot) {
     return true;
 }
 
+let selectedDateStr = null;
+let selectedSlotName = null;
+
 function showDaySlots(dateStr) {
+    selectedDateStr = dateStr;
+    selectedSlotName = null;
     const panel = document.getElementById('day-detail');
     const [y, m, d] = dateStr.split('-').map(Number);
     const date = new Date(y, m - 1, d);
@@ -310,7 +315,7 @@ function showDaySlots(dateStr) {
             <button class="day-detail-close" onclick="document.getElementById('day-detail').style.display='none'">✕</button>
         </div>
         ${allSlots.map(s => `
-            <div class="slot-row ${s.free ? 'free' : 'reserved'}">
+            <div class="slot-row ${s.free ? 'free selectable-slot' : 'reserved'}" ${s.free ? `onclick="selectAvailSlot(this, '${s.name}')"` : ''}>
                 <span class="slot-row-icon">${s.icon}</span>
                 <div class="slot-row-info">
                     <span class="slot-row-name">${s.name}</span>
@@ -319,9 +324,29 @@ function showDaySlots(dateStr) {
                 <span class="slot-row-status">${s.free ? '✅ LIBRE' : '❌ RESERVADO'}</span>
             </div>
         `).join('')}
-        ${allSlots.some(s => s.free) ? '<button class="cta-btn" style="margin-top:12px" onclick="redirectToBooking(\'' + calState.room + '\')">Reservar este tramo →</button>' : '<p class="day-full-msg">Todos los tramos están reservados para este día.</p>'}
+        ${allSlots.some(s => s.free) ? '<button id="btn-reserve-slot" class="cta-btn" style="margin-top:12px; opacity:0.5; pointer-events:none;" onclick="proceedToBookingSlot()">Elige un tramo arriba ↑</button>' : '<p class="day-full-msg">Todos los tramos están reservados para este día.</p>'}
     `;
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function selectAvailSlot(el, slotName) {
+    document.querySelectorAll('.selectable-slot').forEach(n => n.classList.remove('selected-slot'));
+    el.classList.add('selected-slot');
+    selectedSlotName = slotName;
+
+    const btn = document.getElementById('btn-reserve-slot');
+    if (btn) {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+        btn.textContent = 'Reservar este tramo →';
+    }
+}
+
+function proceedToBookingSlot() {
+    if (!selectedDateStr || !selectedSlotName) return;
+    const baseUrl = "https://booking-jl-new-wktk.vercel.app/";
+    const url = `${baseUrl}?room=${calState.room}&date=${selectedDateStr}&slot=${encodeURIComponent(selectedSlotName)}`;
+    window.location.href = url;
 }
 
 function formatDate(d) {
