@@ -1,4 +1,4 @@
-/* ===========================
+﻿/* ===========================
    RESET & BASE
    =========================== */
 *,
@@ -88,7 +88,7 @@ h6,
 }
 
 /* ===========================
-   HERO BANNER / FALDÓN
+   HERO BANNER / FALDÃ“N
    =========================== */
 .hero-banner {
     position: relative;
@@ -642,7 +642,7 @@ h6,
         background: #111;
     }
 
-    /* ── Botpress chat: horizontal centering ── */
+    /* â”€â”€ Botpress chat: horizontal centering â”€â”€ */
     #bp-web-widget-container,
     #botpress-webchat,
     [class*="bpWebchat"],
@@ -1111,3 +1111,97 @@ h6,
     margin-top: 12px;
     padding: 12px;
 }
+
+/* ===========================
+   ESTILOS PREMIUM DE FORMULARIOS
+   =========================== */
+.hub-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;
+    margin-top: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.form-group label {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: var(--primary) !important;
+    margin-bottom: 2px !important;
+    display: block !important;
+    font-family: var(--font-heading) !important;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100% !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    color: var(--text) !important;
+    font-family: var(--font-body) !important;
+    font-size: 1.05rem !important;
+    outline: none !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary) !important;
+    background: var(--surface2) !important;
+    box-shadow: 0 0 15px rgba(79, 195, 247, 0.25) !important;
+}
+
+.form-group textarea {
+    min-height: 140px !important;
+}
+
+.form-check {
+    display: flex !important;
+    gap: 15px !important;
+    align-items: flex-start !important;
+    padding: 15px !important;
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 12px !important;
+    border: 1px dashed var(--border) !important;
+}
+
+.form-check input[type='checkbox'] {
+    width: 24px !important;
+    height: 24px !important;
+    margin-top: 2px !important;
+    accent-color: var(--primary) !important;
+    cursor: pointer !important;
+}
+
+.form-check label {
+    font-size: 0.95rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.6 !important;
+    cursor: pointer !important;
+}
+
+.hub-form .cta-btn {
+    padding: 20px !important;
+    font-size: 1.1rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-top: 15px !important;
+    box-shadow: 0 8px 20px rgba(79, 195, 247, 0.3) !important;
+}
+
