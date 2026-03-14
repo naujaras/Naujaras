@@ -68,6 +68,12 @@
                 <span class="hub-sub">Proceso rápido y directo</span>
             </button>
 
+            <button class="hub-btn" onclick="goTo('screen-manage')">
+                <span class="hub-icon">⚙️</span>
+                <span class="hub-label">Gestionar mi reserva</span>
+                <span class="hub-sub">Cambios, retrasos e incidencias</span>
+            </button>
+
             <!-- Bóton de Oferta (Oculto por defecto, se muestra por JS) -->
             <button id="hub-offer-btn" class="hub-btn offer-btn" onclick="openOfferModal()">
                 <span class="hub-icon">🔥</span>
@@ -76,13 +82,7 @@
             </button>
         </main>
 
-        <footer class="home-footer"
-            style="margin-top: 2rem; padding: 1rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
-            <a href="mailto:naujaras.sevilla@gmail.com"
-                style="color: rgba(255,255,255,0.5); font-size: 0.85rem; text-decoration: none;">
-                ¿Necesitas ayuda con tu reserva? Envíanos un email
-            </a>
-        </footer>
+        </main>
     </div>
 
     <!-- ===== INFO SCREEN ===== -->
@@ -153,6 +153,150 @@
         <div class="floating-reserve">
             <button class="cta-btn" onclick="redirectToBooking(calState ? calState.room : null)">🔑 Reservar
                 ahora</button>
+        </div>
+    </div>
+
+    <!-- ===== MANAGE RESERVATION SCREEN ===== -->
+    <div id="screen-manage" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Gestionar mi reserva</h2>
+        </div>
+
+        <div class="screen-body">
+            <p class="section-intro">¿Necesitas hacer cambios o avisarnos de algo? Selecciona una opción:</p>
+
+            <div class="manage-grid">
+                <button class="hub-btn" onclick="goTo('screen-postpone')">
+                    <span class="hub-icon">📅</span>
+                    <span class="hub-label">Posponer / Cambiar fecha</span>
+                    <span class="hub-sub">Solicita un cambio de día</span>
+                </button>
+
+                <button class="hub-btn" onclick="goTo('screen-delay')">
+                    <span class="hub-icon">🕒</span>
+                    <span class="hub-label">Avisar de retraso</span>
+                    <span class="hub-sub">Si vas a llegar más tarde</span>
+                </button>
+
+                <button class="hub-btn" onclick="goTo('screen-help')">
+                    <span class="hub-icon">🆘</span>
+                    <span class="hub-label">Ayuda / Incidencias</span>
+                    <span class="hub-sub">Consultas y soporte</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== POSTPONE FORM SCREEN ===== -->
+    <div id="screen-postpone" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Posponer Reserva</h2>
+        </div>
+        <div class="screen-body">
+            <form id="form-postpone" class="hub-form" onsubmit="handleFormSubmit(event, 'postpone')">
+                <div class="form-group">
+                    <label>Nombre del titular</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono de contacto</label>
+                    <input type="tel" name="telefono" required placeholder="Ej: 600 000 000">
+                </div>
+                <div class="form-group">
+                    <label>Alojamiento reservado</label>
+                    <select name="room" required>
+                        <option value="atico">Ático</option>
+                        <option value="estudio">Estudio</option>
+                        <option value="habitacion">Habitación</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de la reserva original</label>
+                    <input type="date" name="fecha_original" required>
+                </div>
+                <div class="form-group">
+                    <label>Motivo del cambio</label>
+                    <textarea name="motivo" placeholder="Cuéntanos por qué necesitas cambiar la fecha..."></textarea>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="policy-accept" required>
+                    <label for="policy-accept">Acepto que los cambios con menos de 7 días tienen un coste del 50%, y menos de 48h no se pueden realizar.</label>
+                </div>
+                <button type="submit" class="cta-btn">Enviar solicitud de cambio</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== DELAY FORM SCREEN ===== -->
+    <div id="screen-delay" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Avisar de Retraso</h2>
+        </div>
+        <div class="screen-body">
+            <form id="form-delay" class="hub-form" onsubmit="handleFormSubmit(event, 'delay')">
+                <div class="form-group">
+                    <label>Nombre del titular</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Alojamiento</label>
+                    <select name="room" required>
+                        <option value="atico">Ático</option>
+                        <option value="estudio">Estudio</option>
+                        <option value="habitacion">Habitación</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de la estancia</label>
+                    <input type="date" name="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora estimada de llegada</label>
+                    <input type="time" name="hora" required>
+                </div>
+                <div class="form-group">
+                    <label>Mensaje adicional</label>
+                    <textarea name="mensaje" placeholder="Algún detalle sobre tu llegada..."></textarea>
+                </div>
+                <button type="submit" class="cta-btn">Avisar a Juan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== HELP FORM SCREEN ===== -->
+    <div id="screen-help" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Ayuda e Incidencias</h2>
+        </div>
+        <div class="screen-body">
+            <form id="form-help" class="hub-form" onsubmit="handleFormSubmit(event, 'help')">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono o Email</label>
+                    <input type="text" name="contacto" required placeholder="Cómo prefieres que te contactemos">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de consulta</label>
+                    <select name="tipo" required>
+                        <option value="incidencia">Incidencia con la reserva</option>
+                        <option value="pago">Duda sobre el pago</option>
+                        <option value="acceso">Problema de acceso</option>
+                        <option value="otro">Otros motivos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mensaje</label>
+                    <textarea name="mensaje" required placeholder="Describe tu consulta con detalle..."></textarea>
+                </div>
+                <button type="submit" class="cta-btn">Enviar consulta</button>
+            </form>
         </div>
     </div>
 

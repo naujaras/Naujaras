@@ -1,34 +1,29 @@
 const CONFIG = {
-    ROOMS: {
+    N8N_CHATBOT_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/chatbot-hub',
+    N8N_FORMS_URL: 'https://n8n-n8n.1owldl.easypanel.host/webhook/hub-forms',
+    rooms: {
         atico: {
-            name: "Ático con Piscina",
-            desc: "Piscina privada climatizada y Jacuzzi XXL",
-            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=atico",
-            availability: "Suele agotarse con 2 semanas de antelación.",
-            calendarId: "91fbc4c4ce05435d7146988aceb737dcd04b6c1c6648de88a8edde5b62407de3@group.calendar.google.com"
+            name: 'Ático Naujarás',
+            desc: 'Suite de lujo con jacuzzi XXL privado en terraza, cama king size y vistas espectaculares. Ideal para escapadas románticas premium. (Nota: Acceso por ascensor hasta la planta anterior, luego un pequeño tramo de escaleras).',
+            availability: 'Disponibilidad alta entre semana',
+            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=atico',
+            media: 'images/Atico_1.png'
         },
         estudio: {
-            name: "Estudio Jacuzzi XXL",
-            desc: "Espacio amplio con todas las comodidades",
-            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=estudio",
-            availability: "Disponibilidad alta entre semana.",
-            calendarId: "d4e9330a3e5bd3016772624c0edf840a8be0a83b6c8cfb567779b5fd036a1715@group.calendar.google.com"
+            name: 'Estudio Naujarás',
+            desc: 'Espacio acogedor con jacuzzi XXL integrado, diseño moderno y luz natural. Equipado con ducha de cabina y todas las comodidades para una estancia íntima.',
+            availability: 'Suele agotarse los fines de semana',
+            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=estudio',
+            media: 'images/Estudio_1.png'
         },
         habitacion: {
-            name: "Habitación Jacuzzi XXL",
-            desc: "Ambiente íntimo y romántico",
-            bookingUrl: "https://booking-jl-new-wktk.vercel.app/?room=habitacion",
-            availability: "Ideal para escapadas de última hora.",
-            calendarId: "2484f196e7d7bcf5bc15ff2a9ff20b2125a0c7c02bac42fdd3fba82d759f1529@group.calendar.google.com"
+            name: 'Habitación Naujarás',
+            desc: 'Nuestra opción más equilibrada. Jacuzzi XXL, ambiente relajante y total privacidad. Equipada con ducha de cabina y acabados premium.',
+            availability: 'Disponible la mayoría de fechas',
+            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=habitacion',
+            media: 'images/Habitacion_1.png'
         }
-    },
-    FAQ: [
-        { question: "¿Cuál es el horario de entrada?", answer: "Depende del tramo: Día (12:00-19:00), Noche (21:00-10:00). Consulta el 'Día + Noche' para estancias completas." },
-        { question: "¿Cómo funciona la fianza?", answer: "Se entrega una fianza en efectivo a la llegada (aprox. 50-100€ según estancia) que se devuelve al salir tras revisar la habitación." },
-        { question: "¿Puedo llevar mi propia comida?", answer: "Sí, todas las estancias están equipadas para que puedas traer lo que necesites y disfrutar de una cena privada." },
-        { question: "¿Qué incluye el pack romántico?", answer: "Pétalos, velas led, bombones y una botella de cava para hacer tu estancia inolvidable." }
-    ],
-    N8N_CHATBOT_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/chatbot-hub'
+    }
 };
 
 let currentScreen = 'screen-home';
@@ -356,7 +351,7 @@ function formatDate(d) {
 // --- MEDIA / GALLERY ---
 const GALLERY = {
     atico: [
-        // { type: 'video', id: 'mS_6S331MNo' }, // Video actual "no disponible"
+        { type: 'video', id: 'mS_6S331MNo' },
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
         { type: 'image', src: 'images/Atico_3.png' },
@@ -366,7 +361,7 @@ const GALLERY = {
         { type: 'image', src: 'images/Atico_7.png' }
     ],
     estudio: [
-        // { type: 'video', id: 'p7eF5KAnF0k' }, // Video actual "no disponible"
+        { type: 'video', id: 'p7eF5KAnF0k' },
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' },
@@ -412,10 +407,48 @@ function renderGallery(roomKey) {
 }
 
 // --- BOOKING ---
-function redirectToBooking(roomKey) {
+function redirectToBooking(roomKey, date = null, slot = null) {
     const baseUrl = "https://booking-jl-new-wktk.vercel.app/";
-    const url = roomKey ? `${baseUrl}?room=${roomKey}` : baseUrl;
+    let url = roomKey ? `${baseUrl}?room=${roomKey}` : baseUrl;
+    if (date) url += `&date=${date}`;
+    if (slot) url += `&slot=${encodeURIComponent(slot)}`;
     window.location.href = url;
+}
+
+// --- FORM HANDLING ---
+async function handleFormSubmit(event, type) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    data.type = type; // 'postpone', 'delay', 'help'
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    try {
+        const response = await fetch(CONFIG.N8N_FORMS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert('¡Gracias! Tu solicitud ha sido enviada correctamente. Juan se pondrá en contacto contigo pronto.');
+            form.reset();
+            goBack();
+        } else {
+            throw new Error('Error en la respuesta del servidor');
+        }
+    } catch (err) {
+        console.error('Error al enviar formulario:', err);
+        alert('Lo sentimos, ha ocurrido un error al enviar el formulario. Por favor, inténtalo de nuevo o contacta por email.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
 }
 
 // --- NATIVE CHATBOT (n8n) ---
