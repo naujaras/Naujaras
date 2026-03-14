@@ -371,30 +371,29 @@ function formatDate(d) {
 // --- MEDIA / GALLERY ---
 const GALLERY = {
     atico: [
-        { type: 'video', id: 'mS_6S331MNo' },
+        { type: 'video', id: 'ffRvpZEld3s' },
+        { type: 'video', id: 'R6vkIgNFxB4' },
+        { type: 'video', id: '_EcLnQmrb4I', isShort: true },
+        { type: 'video', id: 'i5I_zigZhbU', isShort: true },
+        { type: 'video', id: 'Jm6nOZepbdM', isShort: true },
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
-        { type: 'image', src: 'images/Atico_3.png' },
-        { type: 'image', src: 'images/Atico_4.png' },
-        { type: 'image', src: 'images/Atico_5.png' },
-        { type: 'image', src: 'images/Atico_6.png' },
-        { type: 'image', src: 'images/Atico_7.png' }
+        { type: 'image', src: 'images/Atico_3.png' }
     ],
     estudio: [
-        { type: 'video', id: 'p7eF5KAnF0k' },
+        { type: 'video', id: 'kQMiYxlYnsk' },
+        { type: 'video', id: 'B7G_jDGRycc' },
+        { type: 'video', id: 'nV1X-XQS3IU', isShort: true },
+        { type: 'video', id: 'NzY0BYr-QAU', isShort: true },
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
-        { type: 'image', src: 'images/Estudio_3.png' },
-        { type: 'image', src: 'images/Estudio_4.png' },
-        { type: 'image', src: 'images/Estudio_5.png' },
-        { type: 'image', src: 'images/Estudio_6.png' },
-        { type: 'image', src: 'images/Estudio_7.png' },
-        { type: 'image', src: 'images/Estudio_8.png' }
+        { type: 'image', src: 'images/Estudio_3.png' }
     ],
     habitacion: [
+        { type: 'video', id: 'R2oYmqhkQMA', isShort: true },
+        { type: 'video', id: '1qjbJ0dwAPY', isShort: true },
         { type: 'image', src: 'images/Habitacion_1.png' },
-        { type: 'image', src: 'images/Habitacion_2.png' },
-        { type: 'image', src: 'images/Habitacion_3.png' }
+        { type: 'image', src: 'images/Habitacion_2.png' }
     ]
 };
 
@@ -410,9 +409,11 @@ function renderGallery(roomKey) {
 
     grid.innerHTML = items.map(item => {
         if (item.type === 'video') {
+            const ratio = item.isShort ? '9/16' : '16/9';
+            const span = item.isShort ? '' : 'style="grid-column: span 2;"';
             return `
-                <div class="gallery-item video-item full-width" style="grid-column: span 2; aspect-ratio: 16/9;">
-                    <iframe src="https://www.youtube.com/embed/${item.id}?rel=0&modestbranding=1" frameborder="0" allowfullscreen style="width:100%; height:100%;"></iframe>
+                <div class="gallery-item video-item ${item.isShort ? 'short-video' : 'full-width'}" ${span} style="aspect-ratio: ${ratio};">
+                    <iframe src="https://www.youtube.com/embed/${item.id}?rel=0&modestbranding=1" frameborder="0" allowfullscreen style="width:100%; height:100%; border-radius:12px;"></iframe>
                 </div>
             `;
         }
