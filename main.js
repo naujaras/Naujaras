@@ -6,21 +6,21 @@ const CONFIG = {
             name: 'Ático Naujarás',
             desc: 'Suite de lujo con jacuzzi XXL privado en terraza, cama king size y vistas espectaculares. Ideal para escapadas románticas premium. (Nota: Acceso por ascensor hasta la planta anterior, luego un pequeño tramo de escaleras).',
             availability: 'Disponibilidad alta entre semana',
-            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=atico',
+            bookingUrl: 'https://bookingjlfinal.vercel.app/?room=atico',
             media: 'images/Atico_1.png'
         },
         estudio: {
             name: 'Estudio Naujarás',
             desc: 'Espacio acogedor con jacuzzi XXL integrado, diseño moderno y luz natural. Equipado con ducha de cabina y todas las comodidades para una estancia íntima.',
             availability: 'Suele agotarse los fines de semana',
-            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=estudio',
+            bookingUrl: 'https://bookingjlfinal.vercel.app/?room=estudio',
             media: 'images/Estudio_1.png'
         },
         habitacion: {
             name: 'Habitación Naujarás',
             desc: 'Nuestra opción más equilibrada. Jacuzzi XXL, ambiente relajante y total privacidad. Equipada con ducha de cabina y acabados premium.',
             availability: 'Disponible la mayoría de fechas',
-            bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=habitacion',
+            bookingUrl: 'https://bookingjlfinal.vercel.app/?room=habitacion',
             media: 'images/Habitacion_1.png'
         }
     },
@@ -412,7 +412,7 @@ function renderGallery(roomKey) {
         if (item.type === 'video') {
             return `
                 <div class="gallery-item video-item full-width" style="grid-column: span 2; aspect-ratio: 16/9;">
-                    <iframe src="https://www.youtube.com/embed/${item.id}" frameborder="0" allowfullscreen style="width:100%; height:100%;"></iframe>
+                    <iframe src="https://www.youtube.com/embed/${item.id}?rel=0&modestbranding=1" frameborder="0" allowfullscreen style="width:100%; height:100%;"></iframe>
                 </div>
             `;
         }
@@ -428,7 +428,7 @@ function renderGallery(roomKey) {
 
 // --- BOOKING ---
 function redirectToBooking(roomKey, date = null, slot = null) {
-    const baseUrl = "https://booking-jl-new-wktk.vercel.app/";
+    const baseUrl = "https://bookingjlfinal.vercel.app/";
     let url = roomKey ? `${baseUrl}?room=${roomKey}` : baseUrl;
     if (date) url += `&date=${date}`;
     if (slot) url += `&slot=${encodeURIComponent(slot)}`;
