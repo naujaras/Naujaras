@@ -23,7 +23,13 @@ const CONFIG = {
             bookingUrl: 'https://booking-jl-new-wktk.vercel.app/?room=habitacion',
             media: 'images/Habitacion_1.png'
         }
-    }
+    },
+    FAQ: [
+        { question: '¿Cómo funciona la fianza?', answer: 'Se entrega en efectivo a la llegada y se devuelve a la salida tras revisar la estancia.' },
+        { question: '¿Puedo llevar invitados?', answer: 'No, la capacidad máxima es de 2 personas (salvo extras en Ático día).' },
+        { question: '¿Hay parquing?', answer: 'No disponemos de parquing privado, hay zona azul y parkings públicos cerca.' },
+        { question: '¿Se puede fumar?', answer: 'No, está prohibido fumar en todas las instalaciones (incluida la terraza del Ático).' }
+    ]
 };
 
 let currentScreen = 'screen-home';
@@ -124,11 +130,13 @@ function updateAvailInfo(roomKey) {
     calState.year = now.getFullYear();
     calState.month = now.getMonth();
     calState.busy = [];
+    selectedDateStr = null;
+    selectedSlotName = null;
     loadAndRenderCalendar();
 }
 
 async function loadAndRenderCalendar() {
-    const room = CONFIG.ROOMS[calState.room];
+    const room = CONFIG.rooms[calState.room];
     const schedule = ROOM_SCHEDULES[calState.room];
     const info = document.getElementById('avail-room-info');
 
@@ -170,7 +178,8 @@ async function loadAndRenderCalendar() {
             ${room.availability}
         </div>
     `;
-    document.getElementById('avail-cta').onclick = () => redirectToBooking(calState.room);
+    // We don't overwrite the onclick here anymore, we define a global function
+    // document.getElementById('avail-cta').onclick = ... is handled by goToBookingWithRoom()
 
     // Fetch busy blocks
     await fetchAndRenderMonth();
@@ -181,6 +190,8 @@ function changeCalMonth(delta) {
     if (calState.month > 11) { calState.month = 0; calState.year++; }
     if (calState.month < 0) { calState.month = 11; calState.year--; }
     document.getElementById('day-detail').style.display = 'none';
+    selectedDateStr = null;
+    selectedSlotName = null;
     fetchAndRenderMonth();
 }
 
@@ -338,10 +349,19 @@ function selectAvailSlot(el, slotName) {
 }
 
 function proceedToBookingSlot() {
-    if (!selectedDateStr || !selectedSlotName) return;
-    const baseUrl = "https://booking-jl-new-wktk.vercel.app/";
-    const url = `${baseUrl}?room=${calState.room}&date=${selectedDateStr}&slot=${encodeURIComponent(selectedSlotName)}`;
-    window.location.href = url;
+    if (!selectedDateStr || !selectedSlotName) {
+        redirectToBooking(calState.room);
+        return;
+    }
+    redirectToBooking(calState.room, selectedDateStr, selectedSlotName);
+}
+
+function goToBookingWithRoom() {
+    if (selectedDateStr && selectedSlotName) {
+        proceedToBookingSlot();
+    } else {
+        redirectToBooking(calState.room);
+    }
 }
 
 function formatDate(d) {
