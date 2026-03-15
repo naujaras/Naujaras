@@ -419,7 +419,7 @@ function renderGallery(roomKey) {
         // Fallback for Github Pages root folder uploads
         const fallbackFilename = item.src.split('/').pop();
         return `
-            <div class="gallery-item" onclick="openImage('${item.src}')">
+            <div class="gallery-item" onclick="openImage(this.querySelector('img').src)">
                 <img src="${item.src}" alt="Naujarás Sevilla" loading="lazy" onerror="if(!this.dataset.tried){this.dataset.tried='true'; this.src='${fallbackFilename}';} else {this.src='https://via.placeholder.com/400x300?text=Naujaras';}">
             </div>
         `;
