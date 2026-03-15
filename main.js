@@ -1,6 +1,6 @@
 const CONFIG = {
-    N8N_CHATBOT_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/chatbot-hub',
-    N8N_FORMS_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/hub-forms',
+    N8N_CHATBOT_URL: 'https://n8n-n8n.1owldl.easypanel.host/webhook/chatbot-hub',
+    N8N_FORMS_URL: 'https://n8n-n8n.1owldl.easypanel.host/webhook/hub-forms',
     rooms: {
         atico: {
             name: 'Ático Naujarás',
@@ -9,19 +9,19 @@ const CONFIG = {
             bookingUrl: 'https://bookingjlfinal.vercel.app/?room=atico',
             media: 'images/Atico_1.png'
         },
-        estudio: {
-            name: 'Estudio Naujarás',
-            desc: 'Espacio acogedor con jacuzzi XXL integrado, diseño moderno y luz natural. Equipado con ducha de cabina y todas las comodidades para una estancia íntima.',
-            availability: 'Suele agotarse los fines de semana',
-            bookingUrl: 'https://bookingjlfinal.vercel.app/?room=estudio',
-            media: 'images/Estudio_1.png'
-        },
         habitacion: {
             name: 'Habitación Naujarás',
             desc: 'Nuestra opción más equilibrada. Jacuzzi XXL, ambiente relajante y total privacidad. Equipada con ducha de cabina y acabados premium.',
             availability: 'Disponible la mayoría de fechas',
             bookingUrl: 'https://bookingjlfinal.vercel.app/?room=habitacion',
             media: 'images/Habitacion_1.png'
+        },
+        estudio: {
+            name: 'Estudio Naujarás',
+            desc: 'Espacio acogedor con jacuzzi XXL integrado, diseño moderno y luz natural. Equipado con ducha de cabina y todas las comodidades para una estancia íntima.',
+            availability: 'Suele agotarse los fines de semana',
+            bookingUrl: 'https://bookingjlfinal.vercel.app/?room=estudio',
+            media: 'images/Estudio_1.png'
         }
     },
     FAQ: [
