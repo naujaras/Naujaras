@@ -1,5 +1,5 @@
 const CONFIG = {
-    N8N_CHATBOT_URL: 'https://n8n-n8n.1owldl.easypanel.host/webhook/chatbot-hub',
+    N8N_CHATBOT_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/chatbot-hub',
     N8N_FORMS_URL: 'https://n8n-n8n.1owldl.easypanel.host/webhook/hub-forms',
     rooms: {
         atico: {
