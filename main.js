@@ -228,7 +228,7 @@ async function fetchAndRenderMonth() {
             date_start: `${dateFrom}T00:00:00Z`,
             date_end: `${dateTo}T23:59:59Z`
         };
-        const resp = await fetch('https://n8n-n8n.1owldl.easypanel.host/webhook/b4920b99-1724-4169-8630-50b4b795911d', {
+        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/b4920b99-1724-4169-8630-50b4b795911d', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -377,7 +377,7 @@ async function showDaySlots(dateStr) {
             room_name: calState.room === 'atico' ? 'Ático' : (calState.room === 'estudio' ? 'Estudio' : 'Habitación'),
             date: `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`
         };
-        const respP = await fetch('https://n8n-n8n.1owldl.easypanel.host/webhook/854bd8ed-d900-4b55-a210-a08dac674651', {
+        const respP = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/854bd8ed-d900-4b55-a210-a08dac674651', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payloadPrices),
