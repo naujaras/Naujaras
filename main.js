@@ -238,18 +238,20 @@ async function fetchAndRenderMonth() {
         let data = await resp.json();
         // El webhook nuevo devuelve el array de eventos de Google Calendar directamente o bajo .json
         if (Array.isArray(data)) {
-           calState.busy = data.map(e => e.json ? e.json : e).filter(e => e.start && e.end).map(e => ({
-               start: e.start.dateTime || e.start.date,
-               end: e.end.dateTime || e.end.date
-           }));
+           calState.busy = data.map(e => e.json ? e.json : e).map(e => {
+               const start = e.start ? (e.start.dateTime || e.start.date) : (e.inicio ? (e.inicio['fecha y hora'] || e.inicio.fecha || e.inicio.date || e.inicio.dateTime) : null);
+               const end = e.end ? (e.end.dateTime || e.end.date) : (e.fin ? (e.fin['fecha y hora'] || e.fin.fecha || e.fin.date || e.fin.dateTime) : null);
+               return { start, end };
+           }).filter(e => e.start && e.end);
         } else if (data && data.busy) {
            calState.busy = Array.isArray(data.busy) ? data.busy : (data.busy[0]?.busy || []);
         } else {
            calState.busy = [];
         }
     } catch (e) {
-        console.warn('API no disponible, mostrando calendario vacío:', e);
-        calState.busy = [];
+        console.error('API no disponible. Evitando reservas dobles:', e);
+        grid.innerHTML = '<div class="cal-loading" style="color:#d32f2f; font-weight:bold; padding: 20px;">⚠️ Error de conexión con el sistema de reservas. Por favor, inténtelo de nuevo más tarde.</div>';
+        return; // Detenemos la ejecución para que no se pinte ningún día como libre.
     }
 
     renderMonthGrid();
