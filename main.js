@@ -236,18 +236,26 @@ async function fetchAndRenderMonth() {
         });
         
         let data = await resp.json();
-        // El webhook nuevo devuelve el array de eventos de Google Calendar directamente o bajo .json
-        if (Array.isArray(data)) {
-           calState.busy = data.map(e => e.json ? e.json : e).map(e => {
-               const start = e.start ? (e.start.dateTime || e.start.date) : (e.inicio ? (e.inicio['fecha y hora'] || e.inicio.fecha || e.inicio.date || e.inicio.dateTime) : null);
-               const end = e.end ? (e.end.dateTime || e.end.date) : (e.fin ? (e.fin['fecha y hora'] || e.fin.fecha || e.fin.date || e.fin.dateTime) : null);
-               return { start, end };
-           }).filter(e => e.start && e.end);
-        } else if (data && data.busy) {
-           calState.busy = Array.isArray(data.busy) ? data.busy : (data.busy[0]?.busy || []);
-        } else {
-           calState.busy = [];
-        }
+        
+        // --- NORMALIZACIÓN BLINDADA DE EVENTOS ---
+        // 1. Agrupar todo lo que nos llegue (objeto único, array, o envuelto en '.busy') en un único array
+        let rawEvents = [];
+        if (Array.isArray(data)) rawEvents = data;
+        else if (data && data.busy && Array.isArray(data.busy)) rawEvents = data.busy;
+        else if (data && typeof data === 'object') rawEvents = [data]; // Si n8n cortó la respuesta y mandó 1 solo evento
+
+        // 2. Extraer datos limpios venga 'start' o venga 'inicio' (en español)
+        calState.busy = rawEvents.map(e => e.json ? e.json : e).map(e => {
+            const start = e.start ? (e.start.dateTime || e.start.date) : (e.inicio ? (e.inicio['fecha y hora'] || e.inicio.fecha || e.inicio.date || e.inicio.dateTime) : null);
+            const end = e.end ? (e.end.dateTime || e.end.date) : (e.fin ? (e.fin['fecha y hora'] || e.fin.fecha || e.fin.date || e.fin.dateTime) : null);
+            // Fallback directo por si 'start' y 'end' son strings (por ejemplo { start: "2026-03-20T...", end: "..." })
+            return { 
+                start: start || (typeof e.start === 'string' ? e.start : null), 
+                end: end || (typeof e.end === 'string' ? e.end : null) 
+            };
+        }).filter(e => e.start && e.end);
+        
+        console.log("Eventos bloqueados reconocidos por el calendario:", calState.busy);
     } catch (e) {
         console.error('API no disponible. Evitando reservas dobles:', e);
         grid.innerHTML = '<div class="cal-loading" style="color:#d32f2f; font-weight:bold; padding: 20px;">⚠️ Error de conexión con el sistema de reservas. Por favor, inténtelo de nuevo más tarde.</div>';
