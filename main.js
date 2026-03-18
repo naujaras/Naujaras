@@ -228,7 +228,7 @@ async function fetchAndRenderMonth() {
             date_start: `${dateFrom}T00:00:00Z`,
             date_end: `${dateTo}T23:59:59Z`
         };
-        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/b4920b99-1724-4169-8630-50b4b795911d', {
+        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/a2e613d7-6690-47de-939d-9c479e95e24c', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
