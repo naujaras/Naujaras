@@ -221,14 +221,17 @@ async function fetchAndRenderMonth() {
     const dateTo = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-${lastDay}`;
 
     try {
-        const url = new URL('https://n8n-n8n.1owldl.easypanel.host/webhook/disponibilidad');
-        url.searchParams.append('room', calState.room);
-        url.searchParams.append('dateFrom', dateFrom);
-        url.searchParams.append('dateTo', dateTo);
-
-        const resp = await fetch(url.toString(), {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' },
+        const payload = {
+            action: 'check_availability',
+            room_id: calState.room,
+            room_name: calState.room === 'atico' ? 'Ático' : (calState.room === 'estudio' ? 'Estudio' : 'Habitación'),
+            date_start: `${dateFrom}T00:00:00Z`,
+            date_end: `${dateTo}T23:59:59Z`
+        };
+        const resp = await fetch('https://n8n-n8n.1owldl.easypanel.host/webhook/b4920b99-1724-4169-8630-50b4b795911d', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
             signal: AbortSignal.timeout(8000) 
         });
         
