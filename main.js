@@ -135,6 +135,21 @@ function updateAvailInfo(roomKey) {
     loadAndRenderCalendar();
 }
 
+function proceedToBookingSlot() {
+    if (!selectedDateStr || !selectedSlotName) {
+        redirectToBooking(calState.room);
+        return;
+    }
+    const slotCode = selectedSlotName.toLowerCase().replace(/ /g, '_').replace(/\(|\)/g, '');
+    let finalCode = 'dia';
+    if (slotCode.includes('noche') && !slotCode.includes('entero')) finalCode = 'noche';
+    if (slotCode.includes('entero') && slotCode.includes('ma')) finalCode = 'dia_entero_manana';
+    if (slotCode.includes('entero') && slotCode.includes('no')) finalCode = 'dia_entero_noche';
+
+    const url = `${CONFIG.rooms[calState.room].bookingUrl}&date=${selectedDateStr}&slot=${finalCode}`;
+    window.location.href = url;
+}
+
 async function loadAndRenderCalendar() {
     const room = CONFIG.rooms[calState.room];
     const schedule = ROOM_SCHEDULES[calState.room];
@@ -206,11 +221,31 @@ async function fetchAndRenderMonth() {
     const dateTo = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-${lastDay}`;
 
     try {
-        const resp = await fetch(`${CONFIG.N8N_CHATBOT_URL.replace('chatbot-hub', 'disponibilidad')}?room=${calState.room}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { signal: AbortSignal.timeout(8000) });
-        const data = await resp.json();
-        calState.busy = Array.isArray(data) ? (data[0]?.busy || []) : (data.busy || []);
+        const url = new URL('https://n8n-n8n.1owldl.easypanel.host/webhook/disponibilidad');
+        url.searchParams.append('room', calState.room);
+        url.searchParams.append('dateFrom', dateFrom);
+        url.searchParams.append('dateTo', dateTo);
+
+        const resp = await fetch(url.toString(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(8000) 
+        });
+        
+        let data = await resp.json();
+        // El webhook nuevo devuelve el array de eventos de Google Calendar directamente o bajo .json
+        if (Array.isArray(data)) {
+           calState.busy = data.map(e => e.json ? e.json : e).filter(e => e.start && e.end).map(e => ({
+               start: e.start.dateTime || e.start.date,
+               end: e.end.dateTime || e.end.date
+           }));
+        } else if (data && data.busy) {
+           calState.busy = Array.isArray(data.busy) ? data.busy : (data.busy[0]?.busy || []);
+        } else {
+           calState.busy = [];
+        }
     } catch (e) {
-        console.warn('API no disponible, mostrando calendario sin datos de reservas:', e);
+        console.warn('API no disponible, mostrando calendario vacío:', e);
         calState.busy = [];
     }
 
@@ -288,7 +323,7 @@ function isSlotFree(dateStr, slot) {
 let selectedDateStr = null;
 let selectedSlotName = null;
 
-function showDaySlots(dateStr) {
+async function showDaySlots(dateStr) {
     selectedDateStr = dateStr;
     selectedSlotName = null;
     const panel = document.getElementById('day-detail');
@@ -297,41 +332,77 @@ function showDaySlots(dateStr) {
     const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
+    panel.style.display = 'block';
+    panel.innerHTML = `<div class="day-detail-header">
+        <span>${dayNames[date.getDay()]} ${d} de ${monthNames[m - 1]}</span>
+        <button class="day-detail-close" onclick="document.getElementById('day-detail').style.display='none'">✕</button>
+    </div>
+    <div style="padding: 20px; text-align: center;">Cargando tramos y precios exactos...</div>`;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
     const slots = ROOM_SCHEDULES[calState.room].slots;
     const diaFree = isSlotFree(dateStr, slots[0]);
     const nocheFree = isSlotFree(dateStr, slots[1]);
     const enteroMananaFree = diaFree && nocheFree;
-    // Día entero noche: Noche of this day + Día of next day
     const nextDateStr = formatDate(new Date(y, m - 1, d + 1));
     const nextDiaFree = isSlotFree(nextDateStr, slots[0]);
     const enteroNocheFree = nocheFree && nextDiaFree;
 
     const allSlots = [
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[0], free: diaFree },
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[1], free: nocheFree },
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[2], free: enteroMananaFree },
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[3], free: enteroNocheFree }
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[0], free: diaFree, key: 'jornada_de_dia' },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[1], free: nocheFree, key: 'jornada_de_noche' },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[2], free: enteroMananaFree, key: 'dia_entero_manana' },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[3], free: enteroNocheFree, key: 'dia_entero_noche' }
     ];
 
-    panel.style.display = 'block';
+    // Cargar Precios en tiempo real del Excel
+    let prices = null;
+    try {
+        const payloadPrices = {
+            action: 'get_prices',
+            room_id: calState.room,
+            room_name: calState.room === 'atico' ? 'Ático' : (calState.room === 'estudio' ? 'Estudio' : 'Habitación'),
+            date: `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`
+        };
+        const respP = await fetch('https://n8n-n8n.1owldl.easypanel.host/webhook/854bd8ed-d900-4b55-a210-a08dac674651', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadPrices),
+            signal: AbortSignal.timeout(8000)
+        });
+        const dataP = await respP.json();
+        if (Array.isArray(dataP) && dataP.length > 0) {
+            prices = dataP[0];
+        } else if (dataP && typeof dataP === 'object' && !Array.isArray(dataP)) {
+            prices = dataP;
+        }
+    } catch (e) {
+        console.warn("No se pudieron cargar precios", e);
+    }
+
     panel.innerHTML = `
         <div class="day-detail-header">
             <span>${dayNames[date.getDay()]} ${d} de ${monthNames[m - 1]}</span>
             <button class="day-detail-close" onclick="document.getElementById('day-detail').style.display='none'">✕</button>
         </div>
-        ${allSlots.map(s => `
+        ${allSlots.map(s => {
+            let priceText = '';
+            if (s.free && prices && prices[s.key]) {
+                priceText = ` (${prices[s.key]}€)`;
+            }
+            return `
             <div class="slot-row ${s.free ? 'free selectable-slot' : 'reserved'}" ${s.free ? `onclick="selectAvailSlot(this, '${s.name}')"` : ''}>
                 <span class="slot-row-icon">${s.icon}</span>
                 <div class="slot-row-info">
                     <span class="slot-row-name">${s.name}</span>
                     <span class="slot-row-hours">${s.hours}</span>
                 </div>
-                <span class="slot-row-status">${s.free ? '✅ LIBRE' : '❌ RESERVADO'}</span>
+                <span class="slot-row-status">${s.free ? '✅ LIBRE' + priceText : '❌ RESERVADO'}</span>
             </div>
-        `).join('')}
+            `;
+        }).join('')}
         ${allSlots.some(s => s.free) ? '<button id="btn-reserve-slot" class="cta-btn" style="margin-top:12px; opacity:0.5; pointer-events:none;" onclick="proceedToBookingSlot()">Elige un tramo arriba ↑</button>' : '<p class="day-full-msg">Todos los tramos están reservados para este día.</p>'}
     `;
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function selectAvailSlot(el, slotName) {
