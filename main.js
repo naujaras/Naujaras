@@ -362,8 +362,8 @@ async function showDaySlots(dateStr) {
     const enteroNocheFree = nocheFree && nextDiaFree;
 
     const allSlots = [
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[0], free: diaFree, key: 'jornada_de_dia' },
-        { ...ROOM_SCHEDULES[calState.room].displaySlots[1], free: nocheFree, key: 'jornada_de_noche' },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[0], free: diaFree, key: 'dia' },
+        { ...ROOM_SCHEDULES[calState.room].displaySlots[1], free: nocheFree, key: 'noche' },
         { ...ROOM_SCHEDULES[calState.room].displaySlots[2], free: enteroMananaFree, key: 'dia_entero_manana' },
         { ...ROOM_SCHEDULES[calState.room].displaySlots[3], free: enteroNocheFree, key: 'dia_entero_noche' }
     ];
