@@ -401,7 +401,8 @@ async function showDaySlots(dateStr) {
         ${allSlots.map(s => {
             let priceText = '';
             if (s.free && prices && prices[s.key]) {
-                priceText = ` (${prices[s.key]}€)`;
+                const pVal = String(prices[s.key]).replace(/€/g, '').trim();
+                priceText = ` (${pVal}€)`;
             }
             return `
             <div class="slot-row ${s.free ? 'free selectable-slot' : 'reserved'}" ${s.free ? `onclick="selectAvailSlot(this, '${s.name}')"` : ''}>
