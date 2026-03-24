@@ -657,6 +657,49 @@ h6,
 }
 
 /* ===========================
+   GLOBAL FAB CHAT
+   =========================== */
+.global-fab-chat {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(79, 195, 247, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 900;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.global-fab-chat:active {
+    transform: scale(0.9);
+}
+
+.global-fab-chat:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 30px rgba(79, 195, 247, 0.4);
+}
+
+.global-fab-chat .fab-icon {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+@media (min-width: 480px) {
+    .global-fab-chat {
+        right: calc(50% - 240px + 24px); 
+    }
+}
+
+/* ===========================
    CHAT MODAL
    =========================== */
 .chat-modal {
