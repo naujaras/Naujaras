@@ -782,4 +782,12 @@ function closeOfferModal() {
 // Run offer check on page load
 document.addEventListener('DOMContentLoaded', () => {
     checkActiveOffer();
+    
+    // Check if there is a hash in the URL to open a specific screen
+    if (window.location.hash) {
+        const screenId = window.location.hash.substring(1);
+        if (document.getElementById(screenId)) {
+            goTo(screenId);
+        }
+    }
 });
