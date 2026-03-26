@@ -791,3 +791,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// --- PAGO EN CAJERO ---
+function copyIban(elementId) {
+    const ibanElement = document.getElementById(elementId);
+    const textToCopy = ibanElement.innerText || ibanElement.textContent;
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('¡IBAN copiado al portapapeles!');
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+            fallbackCopyTextToClipboard(textToCopy);
+        });
+    } else {
+        fallbackCopyTextToClipboard(textToCopy);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        alert('¡IBAN copiado al portapapeles!');
+    } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+    }
+    document.body.removeChild(textArea);
+}
+
+function checkSaldo() {
+    const dniInput = document.getElementById('check-dni').value.trim().toUpperCase();
+    const resultDiv = document.getElementById('saldo-result');
+
+    if (!dniInput || dniInput.length < 5) {
+        resultDiv.style.color = 'red';
+        resultDiv.innerText = 'Por favor, introduce un DNI/NIE válido.';
+        return;
+    }
+
+    resultDiv.style.color = '#333';
+    resultDiv.innerText = 'Buscando tu saldo, un momento...';
+
+    // Call the N8N forms webhook (assuming the user wires it up later)
+    fetch(CONFIG.N8N_FORMS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formType: 'check_saldo', dni: dniInput })
+    })
+    .then(async response => {
+        if (!response.ok) throw new Error('Network error');
+        const data = await response.json();
+        
+        if (data && data.saldo !== undefined && data.saldo !== null) {
+            resultDiv.style.color = '#2d842d';
+            resultDiv.innerHTML = `<span style="font-size: 1.2em;">Tu saldo disponible es: <strong>${data.saldo}€</strong></span>`;
+        } else if (data && data.error) {
+            resultDiv.style.color = '#d9534f';
+            resultDiv.innerText = data.error;
+        } else {
+            resultDiv.style.color = 'blue';
+            resultDiv.innerHTML = 'Solicitud de saldo procesada correctamente.<br>Asegúrate de haber enviado tu comprobante.';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching saldo:', error);
+        resultDiv.style.color = '#555';
+        resultDiv.innerHTML = '<em>No hemos podido verificar tu saldo en este momento. Por favor, abre el Asistente y pídele revisar tu saldo.</em>';
+    });
+}

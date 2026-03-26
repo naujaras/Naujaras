@@ -37,6 +37,13 @@
         </div>
 
         <main class="hub-buttons">
+            <!-- Botón de Oferta (Debe estar el primero si existe) -->
+            <button id="hub-offer-btn" class="hub-btn offer-btn" onclick="openOfferModal()">
+                <span class="hub-icon">🔥</span>
+                <span class="hub-label">OFERTA ÚLTIMA HORA</span>
+                <span class="hub-sub">Toca para descubrirla</span>
+            </button>
+
             <button class="hub-btn" onclick="goTo('screen-info')">
                 <span class="hub-icon">💬</span>
                 <span class="hub-label">Información</span>
@@ -61,26 +68,17 @@
                 <span class="hub-sub">Proceso rápido y directo</span>
             </button>
 
+            <button class="hub-btn" onclick="goTo('screen-cajero')">
+                <span class="hub-icon">💶</span>
+                <span class="hub-label">Pago con cajero</span>
+                <span class="hub-sub">Gestiona tu pago en efectivo</span>
+            </button>
+
             <button class="hub-btn" onclick="goTo('screen-manage')">
                 <span class="hub-icon">⚙️</span>
                 <span class="hub-label">Gestionar mi reserva</span>
                 <span class="hub-sub">Cambios, retrasos e incidencias</span>
             </button>
-
-            <button class="hub-btn" onclick="goTo('screen-cajero')">
-                <span class="hub-icon">💶</span>
-                <span class="hub-label">Pago en cajero</span>
-                <span class="hub-sub">Gestiona tu pago en efectivo</span>
-            </button>
-
-            <!-- Bóton de Oferta (Oculto por defecto, se muestra por JS) -->
-            <button id="hub-offer-btn" class="hub-btn offer-btn" onclick="openOfferModal()">
-                <span class="hub-icon">🔥</span>
-                <span class="hub-label">OFERTA ÚLTIMA HORA</span>
-                <span class="hub-sub">Toca para descubrirla</span>
-            </button>
-        </main>
-
         </main>
     </div>
 
@@ -110,15 +108,52 @@
             <h2>Pago en Cajero</h2>
         </div>
 
-        <div class="screen-body">
-            <p class="section-intro">Si has elegido la modalidad de "Ingreso en Cajero" o "Pago en Efectivo", utiliza el asistente para comunicarte con nosotros, avisarnos de tus recargas o pedir ayuda con el saldo de tu monedero.</p>
+        <div class="screen-body" style="padding-bottom: 30px;">
+            <p class="section-intro" style="margin-bottom: 20px;">
+                <strong style="font-size: 1.1em;">Cómo funciona el Pago en Cajero (será tu Monedero Virtual).</strong><br><br>
+                Si prefieres pagar en efectivo, ponemos a tu disposición nuestro sistema de Monedero Virtual. Funciona como una tarjeta prepago: ingresas el dinero en un cajero de Caixa o BBVA en nuestra cuenta bancaria, nosotros lo validamos (este proceso puede tardar unas horas) y ya puedes usar tu saldo acumulado para reservar.
+            </p>
 
-            <div class="chat-section">
-                <p class="chat-label">El asistente te ayudará con tu saldo:</p>
-                <button class="open-chat-btn" onclick="openChat()">
-                    💬 Gestionar mi saldo por chat
-                </button>
+            <div class="cajero-steps" style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom: 25px;">
+                <h4 style="margin-top:0;">Sigue estos 3 sencillos pasos:</h4>
+                <p><strong>1️⃣ Haz tu ingreso en efectivo.</strong> Acércate a cualquier cajero de CaixaBank o BBVA y realiza el ingreso a nuestro número de cuenta correspondiente por el importe que desees.</p>
+                
+                <h5 style="margin: 15px 0 5px; color:#555;">🏦 Opción BBVA:</h5>
+                <div style="background:var(--accent-color); color:white; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-family:monospace; font-size:1.05em;">
+                    <span id="cajero-iban-bbva">ES59 0182 6795 3702 0165 5693</span>
+                    <button onclick="copyIban('cajero-iban-bbva')" style="background:none; border:none; color:white; font-size:1.2em; cursor:pointer;" title="Copiar IBAN">📋</button>
+                </div>
+
+                <h5 style="margin: 10px 0 5px; color:#555;">🏦 Opción CaixaBank:</h5>
+                <div style="background:var(--accent-color); color:white; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-family:monospace; font-size:1.05em;">
+                    <span id="cajero-iban-caixa">ES68 2100 7245 8802 0004 8856</span>
+                    <button onclick="copyIban('cajero-iban-caixa')" style="background:none; border:none; color:white; font-size:1.2em; cursor:pointer;" title="Copiar IBAN">📋</button>
+                </div>
+
+                <p><strong>2️⃣ Envíanos el comprobante (¡Muy Importante!)</strong> Para que podamos identificar que el dinero es tuyo, es obligatorio que nos envíes una foto clara del ticket que te da el cajero a las dos vías de contacto:</p>
+                <ul style="margin-bottom: 10px; padding-left:20px;">
+                    <li>✉️ Al email: <strong>naujaras@proton.me</strong> (o tu correo principal)</li>
+                    <li>📱 Al WhatsApp: <strong>677 222 166</strong> (Juan)</li>
+                </ul>
+
+                <p><strong>3️⃣ Comprueba tu saldo y ¡ Ya puedes Reservar !</strong> Una vez nuestro equipo verifique el ticket (puede tardar unas horas), tu dinero ingresado aparecerá como "Saldo a tu favor".</p>
+                <p style="font-size:0.9em; opacity:0.8;">Si tu saldo es suficiente para cubrir la estancia que quieres, ¡la reserva se procesará al instante! Si la estancia cuesta, por ejemplo, 120€ y tienes 100€ de saldo, el sistema no te dejará reservar hasta que no ingreses la diferencia.</p>
+                
+                <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
+                <p style="font-size:0.9em; color:#555;">💸 <strong>¿Qué pasa si me sobra dinero o cambio de planes ?</strong> No te preocupes. Puedes acumular todo el saldo que quieras en tu monedero o recuperarlo en cualquier momento. Si lo pides se te reembolsa el dinero que ingresaste sin ningún coste.</p>
             </div>
+
+            <!-- COMPROBADOR DE SALDO -->
+            <div class="balance-checker" style="background: white; border:2px solid var(--accent-color); padding: 20px; border-radius:12px;">
+                <h3 style="margin-top:0; color:var(--accent-color);">🔍 Comprobar saldo</h3>
+                <p style="font-size:0.9em; margin-bottom:10px;">Introduce tu DNI (con la letra en mayúscula y sin espacios) para consultar tu saldo disponible.</p>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <input type="text" id="check-dni" placeholder="Ej: 12345678A" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px; text-transform: uppercase;">
+                </div>
+                <button class="cta-btn" onclick="checkSaldo()" style="width: 100%;">Comprobar mi saldo</button>
+                <div id="saldo-result" style="margin-top:15px; font-weight:bold; text-align:center; min-height:20px;"></div>
+            </div>
+
         </div>
     </div>
 
@@ -334,9 +369,15 @@
 
     <!-- ===== OFFER MODAL ===== -->
     <div id="offer-modal" class="offer-modal">
+        <!-- Nueva cabecera clara para cerrar -->
+        <div class="screen-header" style="position: absolute; top: 0; left: 0; width: 100%; z-index: 10; padding: 16px; border-bottom: none; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);">
+            <button class="cta-btn" onclick="closeOfferModal()" style="width: 100%; max-width: 350px; background: #ff416c; box-shadow: 0 4px 15px rgba(255, 65, 108, 0.5); font-weight: bold; border-radius: 30px; font-size: 1.1em; padding: 14px;">
+                Cerrar Ofertas
+            </button>
+        </div>
+        
         <div class="offer-content" id="offer-images-container"
-            style="max-height: 85vh; overflow-y: auto; padding-bottom: 20px;">
-            <button class="offer-close" onclick="closeOfferModal()">✕</button>
+            style="max-height: 100vh; overflow-y: auto; padding: 80px 20px 80px 20px; width: 100%;">
             <!-- Las imágenes se inyectan por JS aquí -->
         </div>
     </div>
