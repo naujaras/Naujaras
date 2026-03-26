@@ -114,41 +114,41 @@
                 Si prefieres pagar en efectivo, ponemos a tu disposición nuestro sistema de Monedero Virtual. Funciona como una tarjeta prepago: ingresas el dinero en un cajero de Caixa o BBVA en nuestra cuenta bancaria, nosotros lo validamos (este proceso puede tardar unas horas) y ya puedes usar tu saldo acumulado para reservar.
             </p>
 
-            <div class="cajero-steps" style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom: 25px;">
-                <h4 style="margin-top:0;">Sigue estos 3 sencillos pasos:</h4>
-                <p><strong>1️⃣ Haz tu ingreso en efectivo.</strong> Acércate a cualquier cajero de CaixaBank o BBVA y realiza el ingreso a nuestro número de cuenta correspondiente por el importe que desees.</p>
+            <div class="cajero-steps" style="background:var(--surface); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom: 25px;">
+                <h4 style="margin-top:0; color:var(--primary);">Sigue estos 3 sencillos pasos:</h4>
+                <p style="margin-top:10px;"><strong>1️⃣ Haz tu ingreso en efectivo.</strong> Acércate a cualquier cajero de CaixaBank o BBVA y realiza el ingreso a nuestro número de cuenta correspondiente por el importe que desees.</p>
                 
-                <h5 style="margin: 15px 0 5px; color:#555;">🏦 Opción BBVA:</h5>
+                <h5 style="margin: 15px 0 5px; color:var(--text-muted);">🏦 Opción BBVA:</h5>
                 <div style="background:var(--accent-color); color:white; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-family:monospace; font-size:1.05em;">
                     <span id="cajero-iban-bbva">ES59 0182 6795 3702 0165 5693</span>
                     <button onclick="copyIban('cajero-iban-bbva')" style="background:none; border:none; color:white; font-size:1.2em; cursor:pointer;" title="Copiar IBAN">📋</button>
                 </div>
 
-                <h5 style="margin: 10px 0 5px; color:#555;">🏦 Opción CaixaBank:</h5>
+                <h5 style="margin: 10px 0 5px; color:var(--text-muted);">🏦 Opción CaixaBank:</h5>
                 <div style="background:var(--accent-color); color:white; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-family:monospace; font-size:1.05em;">
                     <span id="cajero-iban-caixa">ES68 2100 7245 8802 0004 8856</span>
                     <button onclick="copyIban('cajero-iban-caixa')" style="background:none; border:none; color:white; font-size:1.2em; cursor:pointer;" title="Copiar IBAN">📋</button>
                 </div>
 
                 <p><strong>2️⃣ Envíanos el comprobante (¡Muy Importante!)</strong> Para que podamos identificar que el dinero es tuyo, es obligatorio que nos envíes una foto clara del ticket que te da el cajero a las dos vías de contacto:</p>
-                <ul style="margin-bottom: 10px; padding-left:20px;">
-                    <li>✉️ Al email: <strong>naujaras@proton.me</strong> (o tu correo principal)</li>
-                    <li>📱 Al WhatsApp: <strong>677 222 166</strong> (Juan)</li>
+                <ul style="margin-bottom: 15px; margin-top: 5px; padding-left:20px; color:var(--text-muted);">
+                    <li>✉️ Al email: <strong style="color:var(--text);">naujaras@proton.me</strong></li>
+                    <li>📱 Al WhatsApp: <strong style="color:var(--text);">677 222 166</strong> (Juan)</li>
                 </ul>
 
                 <p><strong>3️⃣ Comprueba tu saldo y ¡ Ya puedes Reservar !</strong> Una vez nuestro equipo verifique el ticket (puede tardar unas horas), tu dinero ingresado aparecerá como "Saldo a tu favor".</p>
-                <p style="font-size:0.9em; opacity:0.8;">Si tu saldo es suficiente para cubrir la estancia que quieres, ¡la reserva se procesará al instante! Si la estancia cuesta, por ejemplo, 120€ y tienes 100€ de saldo, el sistema no te dejará reservar hasta que no ingreses la diferencia.</p>
+                <p style="font-size:0.9em; opacity:0.8; margin-top:5px;">Si tu saldo es suficiente para cubrir la estancia que quieres, ¡la reserva se procesará al instante! Si la estancia cuesta, por ejemplo, 120€ y tienes 100€ de saldo, el sistema no te dejará reservar hasta que no ingreses la diferencia.</p>
                 
-                <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-                <p style="font-size:0.9em; color:#555;">💸 <strong>¿Qué pasa si me sobra dinero o cambio de planes ?</strong> No te preocupes. Puedes acumular todo el saldo que quieras en tu monedero o recuperarlo en cualquier momento. Si lo pides se te reembolsa el dinero que ingresaste sin ningún coste.</p>
+                <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
+                <p style="font-size:0.9em; color:var(--text-muted);">💸 <strong>¿Qué pasa si me sobra dinero o cambio de planes ?</strong> No te preocupes. Puedes acumular todo el saldo que quieras en tu monedero o recuperarlo en cualquier momento. Si lo pides se te reembolsa el dinero que ingresaste sin ningún coste.</p>
             </div>
 
             <!-- COMPROBADOR DE SALDO -->
-            <div class="balance-checker" style="background: white; border:2px solid var(--accent-color); padding: 20px; border-radius:12px;">
-                <h3 style="margin-top:0; color:var(--accent-color);">🔍 Comprobar saldo</h3>
-                <p style="font-size:0.9em; margin-bottom:10px;">Introduce tu DNI (con la letra en mayúscula y sin espacios) para consultar tu saldo disponible.</p>
+            <div class="balance-checker" style="background: var(--surface); border:2px solid var(--primary); padding: 20px; border-radius:12px;">
+                <h3 style="margin-top:0; color:var(--primary);">🔍 Comprobar saldo</h3>
+                <p style="font-size:0.9em; margin-bottom:10px; color:var(--text-muted);">Introduce tu DNI (con la letra en mayúscula y sin espacios) para consultar tu saldo disponible.</p>
                 <div class="form-group" style="margin-bottom: 15px;">
-                    <input type="text" id="check-dni" placeholder="Ej: 12345678A" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:8px; text-transform: uppercase;">
+                    <input type="text" id="check-dni" placeholder="Ej: 12345678A" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; text-transform: uppercase; background: var(--bg); color: var(--text);">
                 </div>
                 <button class="cta-btn" onclick="checkSaldo()" style="width: 100%;">Comprobar mi saldo</button>
                 <div id="saldo-result" style="margin-top:15px; font-weight:bold; text-align:center; min-height:20px;"></div>
