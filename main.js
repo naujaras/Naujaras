@@ -1,6 +1,7 @@
 const CONFIG = {
     N8N_CHATBOT_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/chatbot-hub',
     N8N_FORMS_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/hub-forms',
+    N8N_SALDO_URL: 'https://n8n-n8n.npfusf.easypanel.host/webhook/saldo-cajero',
     rooms: {
         atico: {
             name: 'Ático Naujarás',
@@ -837,8 +838,8 @@ function checkSaldo() {
     resultDiv.style.color = '#333';
     resultDiv.innerText = 'Buscando tu saldo, un momento...';
 
-    // Call the N8N forms webhook (assuming the user wires it up later)
-    fetch(CONFIG.N8N_FORMS_URL, {
+    // Call the N8N Saldo separate webhook directly
+    fetch(CONFIG.N8N_SALDO_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formType: 'check_saldo', dni: dniInput })
