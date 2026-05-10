@@ -537,7 +537,8 @@ window.goTo = function(screenId, params) {
     originalGoTo(screenId, params);
     if (screenId === 'screen-rates') {
         const activeTab = document.querySelector('#rates-room-tabs .room-tab.active');
-        const roomKey = activeTab.textContent.toLowerCase().includes('atico') ? 'atico' : (activeTab.textContent.toLowerCase().includes('estudio') ? 'estudio' : 'habitacion');
+        const text = activeTab.textContent.toLowerCase();
+        const roomKey = text.includes('tico') ? 'atico' : (text.includes('estudio') ? 'estudio' : 'habitacion');
         renderRates(roomKey);
     }
 };
