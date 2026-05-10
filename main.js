@@ -403,7 +403,7 @@ async function showDaySlots(dateStr) {
             let priceText = '';
             if (s.free && prices && prices[s.key]) {
                 const pVal = String(prices[s.key]).replace(/€/g, '').trim();
-                priceText = ` (${pVal}€)`;
+                priceText = ` <span style="color:#00BFFF; font-size:1.15em; font-weight:bold;">${pVal}€</span>`;
             }
             return `
             <div class="slot-row ${s.free ? 'free selectable-slot' : 'reserved'}" ${s.free ? `onclick="selectAvailSlot(this, '${s.name}')"` : ''}>
@@ -452,6 +452,95 @@ function goToBookingWithRoom() {
 function formatDate(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
+
+// --- RATES SCREEN LOGIC ---
+const FALLBACK_RATES = {
+    vigencia: "30 de mayo",
+    atico: [
+        { group: "Jornada de día (13h-20h)", items: [{ desc: "Lunes a Viernes (excepto festivos)", price: "89 €" }, { desc: "Sábados o Domingos (y festivos)", price: "119 €" }] },
+        { group: "Jornada de noche (22h-11h)", items: [{ desc: "Domingo a Jueves (excepto vísperas)", price: "149 €" }, { desc: "Viernes o Sábados (y vísperas)", price: "229 €" }] },
+        { group: "Día entero mañana (13h-11h)", items: [{ desc: "Lunes a Jueves", price: "229 €" }, { desc: "Viernes (excepto festivos)", price: "299 €" }, { desc: "Sábados", price: "329 €" }, { desc: "Domingos (y festivos)", price: "249 €" }] },
+        { group: "Día entero noche (22h-20h)", items: [{ desc: "Domingo a Jueves", price: "229 €" }, { desc: "Viernes a Sábado", price: "329 €" }, { desc: "Sábado a Domingo", price: "329 €" }] }
+    ],
+    habitacion: [
+        { group: "Jornada de día (13,30h-19,30h)", items: [{ desc: "Lunes a Viernes (excepto festivos)", price: "39 €" }, { desc: "Sábados o Domingos (y festivos)", price: "49 €" }] },
+        { group: "Jornada de noche (21h-12h)", items: [{ desc: "Domingo a Jueves (excepto vísperas)", price: "65 €" }, { desc: "Viernes o Sábados (y vísperas)", price: "109 €" }] },
+        { group: "Día entero mañana (13,30h-12h)", items: [{ desc: "Lunes a Jueves", price: "99 €" }, { desc: "Viernes (excepto festivos)", price: "139 €" }, { desc: "Sábados", price: "149 €" }, { desc: "Domingos (y festivos)", price: "109 €" }] },
+        { group: "Día entero noche (21h-19,30h)", items: [{ desc: "Domingo a Jueves", price: "99 €" }, { desc: "Viernes a Sábado", price: "149 €" }, { desc: "Sábado a Domingo", price: "149 €" }] }
+    ],
+    estudio: [
+        { group: "Jornada de día (12h-18.30h)", items: [{ desc: "Lunes a Viernes (excepto festivos)", price: "45 €" }, { desc: "Sábados o Domingos (y festivos)", price: "59 €" }] },
+        { group: "Jornada de noche (20h-10h)", items: [{ desc: "Domingo a Jueves (excepto vísperas)", price: "75 €" }, { desc: "Viernes o Sábados (y vísperas)", price: "139 €" }] },
+        { group: "Día entero mañana (12h-10h)", items: [{ desc: "Lunes a Jueves", price: "109 €" }, { desc: "Viernes (excepto festivos)", price: "169 €" }, { desc: "Sábados", price: "189 €" }, { desc: "Domingos (y festivos)", price: "129 €" }] },
+        { group: "Día entero noche (20h-18.30h)", items: [{ desc: "Domingo a Jueves", price: "109 €" }, { desc: "Viernes a Sábado", price: "189 €" }, { desc: "Sábado a Domingo", price: "189 €" }] }
+    ]
+};
+
+let currentRatesData = FALLBACK_RATES;
+let ratesLoaded = false;
+
+async function loadRates() {
+    if (ratesLoaded) return;
+    try {
+        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/tarifas-web');
+        const data = await resp.json();
+        if (data && data.atico) {
+            currentRatesData = data;
+        }
+    } catch (e) {
+        console.warn("No se pudo cargar precios actualizados desde Excel, usando base.", e);
+    }
+    ratesLoaded = true;
+}
+
+function selectRatesRoom(roomKey, btn) {
+    document.querySelectorAll('#rates-room-tabs .room-tab').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    renderRates(roomKey);
+}
+
+async function renderRates(roomKey) {
+    const container = document.getElementById('rates-content-container');
+    if (!ratesLoaded) {
+        container.innerHTML = '<div class="cal-loading" style="text-align:center; padding: 20px;">Cargando tarifas...</div>';
+        await loadRates();
+    }
+    
+    document.getElementById('rate-vigencia').textContent = currentRatesData.vigencia || "30 de mayo";
+    const data = currentRatesData[roomKey] || FALLBACK_RATES[roomKey];
+    
+    let html = '';
+    data.forEach(group => {
+        html += `<div style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; margin-bottom:15px; overflow:hidden;">
+            <div style="background:var(--primary); color:#fff; font-weight:bold; padding:10px 15px; font-size:1rem;">
+                ${group.group}
+            </div>
+            <div style="padding:10px;">
+        `;
+        group.items.forEach(item => {
+            html += `
+                <div style="display:flex; justify-content:space-between; padding:8px 5px; border-bottom:1px solid var(--border);">
+                    <span style="color:var(--text-muted); font-size:0.9rem; flex:1; padding-right:10px;">${item.desc}</span>
+                    <strong style="color:var(--text); font-size:1rem; white-space:nowrap;">${item.price}</strong>
+                </div>
+            `;
+        });
+        html += `</div></div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Interceptar goTo para que cargue tarifas si abre la pantalla
+const originalGoTo = window.goTo || goTo;
+window.goTo = function(screenId, params) {
+    originalGoTo(screenId, params);
+    if (screenId === 'screen-rates') {
+        const activeTab = document.querySelector('#rates-room-tabs .room-tab.active');
+        const roomKey = activeTab.textContent.toLowerCase().includes('atico') ? 'atico' : (activeTab.textContent.toLowerCase().includes('estudio') ? 'estudio' : 'habitacion');
+        renderRates(roomKey);
+    }
+};
 
 // --- MEDIA / GALLERY ---
 const GALLERY = {

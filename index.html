@@ -24,19 +24,16 @@
     <!-- ===== HOME SCREEN ===== -->
     <div id="screen-home" class="screen active">
 
-        <!-- ===== FALDÓN / HERO BANNER ===== -->
-        <div class="hero-banner">
+        <div class="hero-banner" style="height: 32vh; min-height: 220px;">
             <img src="images/Atico_1.png"
                 onerror="if(!this.dataset.tried){this.dataset.tried='true'; this.src='Atico_1.png';}else{this.src='https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=900&q=80';}"
                 alt="Suite romántica Naujarás con jacuzzi XXL" class="hero-img">
             <div class="hero-overlay-center">
-                <div class="logo-mark">♥</div>
-                <h1 class="hero-title">Naujarás</h1>
-                <p class="hero-subtitle">Estancias con Jacuzzi XXL en Sevilla</p>
+                <h1 class="hero-title" style="margin-bottom: 0; font-size: 2.8rem;">Naujarás</h1>
             </div>
         </div>
 
-        <main class="hub-buttons">
+        <main class="hub-buttons" style="padding: 0px 16px 20px;">
             <!-- Botón de Oferta (Debe estar el primero si existe) -->
             <button id="hub-offer-btn" class="hub-btn offer-btn" onclick="openOfferModal()">
                 <span class="hub-icon">🔥</span>
@@ -54,6 +51,12 @@
                 <span class="hub-icon">📅</span>
                 <span class="hub-label">Disponibilidad</span>
                 <span class="hub-sub">Consulta fechas libres</span>
+            </button>
+
+            <button class="hub-btn" onclick="goTo('screen-rates')">
+                <span class="hub-icon">💶</span>
+                <span class="hub-label">Precios</span>
+                <span class="hub-sub">Tarifas informativas</span>
             </button>
 
             <button class="hub-btn" onclick="goTo('screen-media')">
@@ -352,7 +355,38 @@
         </div>
     </div>
 
-    <!-- ===== BOOKING SCREEN REMOVED ===== --> <!-- ===== CHAT MODAL ===== -->
+    <!-- ===== RATES SCREEN ===== -->
+    <div id="screen-rates" class="screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="goBack()">← Volver</button>
+            <h2>Precios</h2>
+        </div>
+
+        <div class="screen-body">
+            <div style="background: var(--surface); padding: 15px; border-radius: 8px; border: 1px solid var(--primary); margin-bottom: 20px;">
+                <p style="font-size: 0.95rem; color: var(--text); text-align: center; margin: 0; line-height: 1.4;">
+                    <strong style="color: var(--primary);">Tarifas orientativas válidas hasta el <span id="rate-vigencia">30 de mayo</span>.</strong><br>
+                    Para reservar, utiliza el botón de Disponibilidad o el botón de Reservar.
+                </p>
+            </div>
+
+            <div class="room-tabs" id="rates-room-tabs">
+                <button class="room-tab active" onclick="selectRatesRoom('atico', this)">Ático</button>
+                <button class="room-tab" onclick="selectRatesRoom('habitacion', this)">Habitación</button>
+                <button class="room-tab" onclick="selectRatesRoom('estudio', this)">Estudio</button>
+            </div>
+
+            <div id="rates-content-container">
+                <div class="cal-loading" style="text-align:center; padding: 20px;">Cargando tarifas...</div>
+            </div>
+            
+            <button class="cta-btn" onclick="goTo('screen-availability')" style="margin-top: 20px;">
+                Ver disponibilidad y reservar →
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== CHAT MODAL ===== -->
     <div id="chat-modal" class="chat-modal">
         <div class="chat-header">
             <h3>Asistente Naujarás</h3>
