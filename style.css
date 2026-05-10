@@ -343,7 +343,8 @@ h6,
     font-weight: 700;
 }
 
-.back-btn { background: none;
+.back-btn {
+    background: none;
     border: none;
     color: var(--primary);
     font-size: 1rem;
@@ -359,6 +360,12 @@ h6,
     padding: 20px 16px;
     overflow-y: auto;
     padding-bottom: 100px;
+}
+
+.manage-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .section-intro {
