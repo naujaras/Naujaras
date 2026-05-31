@@ -186,6 +186,9 @@ async function loadAndRenderCalendar() {
             <div class="cal-grid" id="cal-grid">
                 <div class="cal-loading">Cargando disponibilidad...</div>
             </div>
+            <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:12px; font-style:italic;">
+                👇 Toca un día en el calendario para ver los tramos libres y reservar
+            </p>
         </div>
         <div class="day-detail-panel" id="day-detail" style="display:none;"></div>
         <div class="avail-status">
