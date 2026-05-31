@@ -417,9 +417,10 @@
     </div>
 
     <!-- ===== IMAGE MODAL (ENLARGE) ===== -->
-    <div id="image-modal" class="image-modal" onclick="closeImage()">
-        <img id="image-modal-img" src="" alt="Vista ampliada">
-        <button class="image-modal-close" onclick="closeImage()">✕</button>
+    <div id="image-modal" class="image-modal" onclick="closeImage(event)">
+        <img id="image-modal-img" src="" alt="Vista ampliada" style="display:none;">
+        <video id="video-modal-vid" controls playsinline style="display:none; max-width: 100vw; max-height: 100vh; object-fit: contain;"></video>
+        <button class="image-modal-close" onclick="closeImage(event)">✕</button>
     </div>
 
     <script src="main.js"></script>

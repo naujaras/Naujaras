@@ -594,8 +594,11 @@ function renderGallery(roomKey) {
         }
         if (item.type === 'local-video') {
             return `
-                <div class="gallery-item video-item short-video" style="aspect-ratio: 9/16;">
-                    <video src="${item.src}" controls preload="metadata" style="width:100%; height:100%; border-radius:12px; object-fit: cover;"></video>
+                <div class="gallery-item video-item short-video" style="aspect-ratio: 9/16; position: relative; cursor: pointer;" onclick="openVideo('${item.src}')">
+                    <video src="${item.src}" preload="metadata" style="width:100%; height:100%; border-radius:12px; object-fit: cover; pointer-events: none;"></video>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+                        ▶
+                    </div>
                 </div>
             `;
         }
@@ -621,12 +624,39 @@ function renderGallery(roomKey) {
 function openImage(src) {
     const modal = document.getElementById('image-modal');
     const img = document.getElementById('image-modal-img');
+    const vid = document.getElementById('video-modal-vid');
+    
+    if (vid) {
+        vid.style.display = 'none';
+        vid.pause();
+    }
     img.src = src;
+    img.style.display = 'block';
     modal.classList.add('active');
 }
 
-function closeImage() {
+function openVideo(src) {
     const modal = document.getElementById('image-modal');
+    const img = document.getElementById('image-modal-img');
+    const vid = document.getElementById('video-modal-vid');
+    
+    if (img) img.style.display = 'none';
+    if (vid) {
+        vid.src = src;
+        vid.style.display = 'block';
+        vid.play().catch(e => console.log('Autoplay prevented', e));
+    }
+    modal.classList.add('active');
+}
+
+function closeImage(event) {
+    // Si se pasa event y no se ha hecho clic en el fondo o en el botón cerrar, no cerrar.
+    if (event && event.target.tagName === 'VIDEO' || event && event.target.tagName === 'IMG') {
+        return;
+    }
+    const modal = document.getElementById('image-modal');
+    const vid = document.getElementById('video-modal-vid');
+    if (vid) vid.pause();
     modal.classList.remove('active');
 }
 
