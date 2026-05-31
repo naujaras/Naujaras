@@ -547,28 +547,28 @@ window.goTo = function(screenId, params) {
 const GALLERY = {
     atico: [
         { type: '3d-tour', src: 'https://my.matterport.com/show/?m=jMSbKFEtoSa' },
-        { type: 'local-video', src: 'videos/atico1.mp4' },
-        { type: 'local-video', src: 'videos/atico2.mp4' },
-        { type: 'local-video', src: 'videos/atico3.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico3.mp4' },
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
         { type: 'image', src: 'images/Atico_3.png' }
     ],
     estudio: [
         { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=11&sr=-1.09,1.38' },
-        { type: 'local-video', src: 'videos/estudio1.mp4' },
-        { type: 'local-video', src: 'videos/estudio2.mp4' },
-        { type: 'local-video', src: 'videos/estudio3.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio3.mp4' },
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' }
     ],
     habitacion: [
         { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=25&sr=-2.88,-.49' },
-        { type: 'local-video', src: 'videos/habitacion1.mp4' },
-        { type: 'local-video', src: 'videos/habitacion2.mp4' },
-        { type: 'local-video', src: 'videos/habitacion3.mp4' },
-        { type: 'local-video', src: 'videos/habitacion4.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion3.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion4.mp4' },
         { type: 'image', src: 'images/Habitacion_1.png' },
         { type: 'image', src: 'images/Habitacion_2.png' }
     ]
