@@ -771,6 +771,15 @@ function formatBotText(text) {
     safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
     // Convert markdown italic *text* or _text_ to <em> (single asterisk)
     safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Auto-link URLs
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    safe = safe.replace(urlRegex, function(url) {
+        // Eliminar posible puntuación final del enlace (como un punto o coma)
+        var cleanUrl = url.replace(/[\.,;]$/, '');
+        return '<a href="' + cleanUrl + '" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: bold;">' + cleanUrl + '</a>';
+    });
+
     // Handle both literal \n (from JSON string) and real newlines
     safe = safe.replace(/\\n/g, '<br>');
     safe = safe.replace(/\n/g, '<br>');
