@@ -546,27 +546,29 @@ window.goTo = function(screenId, params) {
 // --- MEDIA / GALLERY ---
 const GALLERY = {
     atico: [
-        { type: 'video', id: 'ffRvpZEld3s' },
-        { type: 'video', id: 'R6vkIgNFxB4' },
-        { type: 'video', id: '_EcLnQmrb4I', isShort: true },
-        { type: 'video', id: 'i5I_zigZhbU', isShort: true },
-        { type: 'video', id: 'Jm6nOZepbdM', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=jMSbKFEtoSa' },
+        { type: 'local-video', src: 'videos/atico1.mp4' },
+        { type: 'local-video', src: 'videos/atico2.mp4' },
+        { type: 'local-video', src: 'videos/atico3.mp4' },
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
         { type: 'image', src: 'images/Atico_3.png' }
     ],
     estudio: [
-        { type: 'video', id: 'kQMiYxlYnsk' },
-        { type: 'video', id: 'B7G_jDGRycc' },
-        { type: 'video', id: 'nV1X-XQS3IU', isShort: true },
-        { type: 'video', id: 'NzY0BYr-QAU', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=11&sr=-1.09,1.38' },
+        { type: 'local-video', src: 'videos/estudio1.mp4' },
+        { type: 'local-video', src: 'videos/estudio2.mp4' },
+        { type: 'local-video', src: 'videos/estudio3.mp4' },
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' }
     ],
     habitacion: [
-        { type: 'video', id: 'R2oYmqhkQMA', isShort: true },
-        { type: 'video', id: '1qjbJ0dwAPY', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=25&sr=-2.88,-.49' },
+        { type: 'local-video', src: 'videos/habitacion1.mp4' },
+        { type: 'local-video', src: 'videos/habitacion2.mp4' },
+        { type: 'local-video', src: 'videos/habitacion3.mp4' },
+        { type: 'local-video', src: 'videos/habitacion4.mp4' },
         { type: 'image', src: 'images/Habitacion_1.png' },
         { type: 'image', src: 'images/Habitacion_2.png' }
     ]
@@ -583,6 +585,20 @@ function renderGallery(roomKey) {
     const items = GALLERY[roomKey] || [];
 
     grid.innerHTML = items.map(item => {
+        if (item.type === '3d-tour') {
+            return `
+                <div class="gallery-item video-item full-width" style="aspect-ratio: 16/9; grid-column: span 2;">
+                    <iframe src="${item.src}" frameborder="0" allowfullscreen style="width:100%; height:100%; border-radius:12px;"></iframe>
+                </div>
+            `;
+        }
+        if (item.type === 'local-video') {
+            return `
+                <div class="gallery-item video-item short-video" style="aspect-ratio: 9/16;">
+                    <video src="${item.src}" controls preload="metadata" style="width:100%; height:100%; border-radius:12px; object-fit: cover;"></video>
+                </div>
+            `;
+        }
         if (item.type === 'video') {
             const ratio = item.isShort ? '9/16' : '16/9';
             const span = item.isShort ? '' : 'style="grid-column: span 2;"';
