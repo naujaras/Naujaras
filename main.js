@@ -221,8 +221,9 @@ async function fetchAndRenderMonth() {
     grid.innerHTML = '<div class="cal-loading">Cargando...</div>';
 
     const dateFrom = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-01`;
-    const lastDay = new Date(calState.year, calState.month + 1, 0).getDate();
-    const dateTo = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-${lastDay}`;
+    // Solución bug fin de mes: pedimos eventos hasta el día 2 del mes siguiente
+    const nextMonthDate = new Date(calState.year, calState.month + 1, 2);
+    const dateTo = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}-02`;
 
     try {
         const payload = {
