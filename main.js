@@ -186,6 +186,9 @@ async function loadAndRenderCalendar() {
             <div class="cal-grid" id="cal-grid">
                 <div class="cal-loading">Cargando disponibilidad...</div>
             </div>
+            <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:12px; font-style:italic;">
+                👇 Toca un día en el calendario para ver los tramos libres y reservar
+            </p>
         </div>
         <div class="day-detail-panel" id="day-detail" style="display:none;"></div>
         <div class="avail-status">
@@ -218,8 +221,9 @@ async function fetchAndRenderMonth() {
     grid.innerHTML = '<div class="cal-loading">Cargando...</div>';
 
     const dateFrom = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-01`;
-    const lastDay = new Date(calState.year, calState.month + 1, 0).getDate();
-    const dateTo = `${calState.year}-${String(calState.month + 1).padStart(2, '0')}-${lastDay}`;
+    // Solución bug fin de mes: pedimos eventos hasta el día 2 del mes siguiente
+    const nextMonthDate = new Date(calState.year, calState.month + 1, 2);
+    const dateTo = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}-02`;
 
     try {
         const payload = {
@@ -229,7 +233,7 @@ async function fetchAndRenderMonth() {
             date_start: `${dateFrom}T00:00:00Z`,
             date_end: `${dateTo}T23:59:59Z`
         };
-        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/a2e613d7-6690-47de-939d-9c479e95e24c', {
+        const resp = await fetch('https://n8n-n8n.npfusf.easypanel.host/webhook/b4920b99-1724-4169-8630-50b4b795911d', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -537,7 +541,8 @@ window.goTo = function(screenId, params) {
     originalGoTo(screenId, params);
     if (screenId === 'screen-rates') {
         const activeTab = document.querySelector('#rates-room-tabs .room-tab.active');
-        const roomKey = activeTab.textContent.toLowerCase().includes('atico') ? 'atico' : (activeTab.textContent.toLowerCase().includes('estudio') ? 'estudio' : 'habitacion');
+        const text = activeTab.textContent.toLowerCase();
+        const roomKey = text.includes('tico') ? 'atico' : (text.includes('estudio') ? 'estudio' : 'habitacion');
         renderRates(roomKey);
     }
 };
@@ -545,27 +550,29 @@ window.goTo = function(screenId, params) {
 // --- MEDIA / GALLERY ---
 const GALLERY = {
     atico: [
-        { type: 'video', id: 'ffRvpZEld3s' },
-        { type: 'video', id: 'R6vkIgNFxB4' },
-        { type: 'video', id: '_EcLnQmrb4I', isShort: true },
-        { type: 'video', id: 'i5I_zigZhbU', isShort: true },
-        { type: 'video', id: 'Jm6nOZepbdM', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=jMSbKFEtoSa' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/atico3.mp4' },
         { type: 'image', src: 'images/Atico_1.png' },
         { type: 'image', src: 'images/Atico_2.png' },
         { type: 'image', src: 'images/Atico_3.png' }
     ],
     estudio: [
-        { type: 'video', id: 'kQMiYxlYnsk' },
-        { type: 'video', id: 'B7G_jDGRycc' },
-        { type: 'video', id: 'nV1X-XQS3IU', isShort: true },
-        { type: 'video', id: 'NzY0BYr-QAU', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=11&sr=-1.09,1.38' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/estudio3.mp4' },
         { type: 'image', src: 'images/Estudio_1.png' },
         { type: 'image', src: 'images/Estudio_2.png' },
         { type: 'image', src: 'images/Estudio_3.png' }
     ],
     habitacion: [
-        { type: 'video', id: 'R2oYmqhkQMA', isShort: true },
-        { type: 'video', id: '1qjbJ0dwAPY', isShort: true },
+        { type: '3d-tour', src: 'https://my.matterport.com/show/?m=tTPuVY8puvu&ss=25&sr=-2.88,-.49' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion1.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion2.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion3.mp4' },
+        { type: 'local-video', src: 'https://bookingjlfinal.vercel.app/videos/habitacion4.mp4' },
         { type: 'image', src: 'images/Habitacion_1.png' },
         { type: 'image', src: 'images/Habitacion_2.png' }
     ]
@@ -582,6 +589,23 @@ function renderGallery(roomKey) {
     const items = GALLERY[roomKey] || [];
 
     grid.innerHTML = items.map(item => {
+        if (item.type === '3d-tour') {
+            return `
+                <div class="gallery-item video-item full-width" style="aspect-ratio: 16/9; grid-column: span 2;">
+                    <iframe src="${item.src}" frameborder="0" allowfullscreen style="width:100%; height:100%; border-radius:12px;"></iframe>
+                </div>
+            `;
+        }
+        if (item.type === 'local-video') {
+            return `
+                <div class="gallery-item video-item short-video" style="aspect-ratio: 9/16; position: relative; cursor: pointer;" onclick="openVideo('${item.src}')">
+                    <video src="${item.src}" preload="metadata" style="width:100%; height:100%; border-radius:12px; object-fit: cover; pointer-events: none;"></video>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+                        ▶
+                    </div>
+                </div>
+            `;
+        }
         if (item.type === 'video') {
             const ratio = item.isShort ? '9/16' : '16/9';
             const span = item.isShort ? '' : 'style="grid-column: span 2;"';
@@ -604,12 +628,39 @@ function renderGallery(roomKey) {
 function openImage(src) {
     const modal = document.getElementById('image-modal');
     const img = document.getElementById('image-modal-img');
+    const vid = document.getElementById('video-modal-vid');
+    
+    if (vid) {
+        vid.style.display = 'none';
+        vid.pause();
+    }
     img.src = src;
+    img.style.display = 'block';
     modal.classList.add('active');
 }
 
-function closeImage() {
+function openVideo(src) {
     const modal = document.getElementById('image-modal');
+    const img = document.getElementById('image-modal-img');
+    const vid = document.getElementById('video-modal-vid');
+    
+    if (img) img.style.display = 'none';
+    if (vid) {
+        vid.src = src;
+        vid.style.display = 'block';
+        vid.play().catch(e => console.log('Autoplay prevented', e));
+    }
+    modal.classList.add('active');
+}
+
+function closeImage(event) {
+    // Si se pasa event y no se ha hecho clic en el fondo o en el botón cerrar, no cerrar.
+    if (event && event.target.tagName === 'VIDEO' || event && event.target.tagName === 'IMG') {
+        return;
+    }
+    const modal = document.getElementById('image-modal');
+    const vid = document.getElementById('video-modal-vid');
+    if (vid) vid.pause();
     modal.classList.remove('active');
 }
 
@@ -754,6 +805,15 @@ function formatBotText(text) {
     safe = safe.replace(/__(.+?)__/g, '<strong>$1</strong>');
     // Convert markdown italic *text* or _text_ to <em> (single asterisk)
     safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Auto-link URLs
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    safe = safe.replace(urlRegex, function(url) {
+        // Eliminar posible puntuación final del enlace (como un punto o coma)
+        var cleanUrl = url.replace(/[\.,;]$/, '');
+        return '<a href="' + cleanUrl + '" target="_blank" style="color: var(--primary); text-decoration: underline; font-weight: bold;">' + cleanUrl + '</a>';
+    });
+
     // Handle both literal \n (from JSON string) and real newlines
     safe = safe.replace(/\\n/g, '<br>');
     safe = safe.replace(/\n/g, '<br>');
