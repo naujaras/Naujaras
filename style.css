@@ -263,8 +263,11 @@ h6,
 
 .offer-content {
     position: relative;
-    max-width: 100%;
+    max-width: 480px;
+    width: 100%;
     max-height: 90vh;
+    display: flex;
+    justify-content: center;
 }
 
 #offer-image-full {
